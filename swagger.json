@@ -1,0 +1,3476 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "BeezUP gateway API",
+    "description": "\r\n# The REST API of BeezUP system - Adapter\r\n## Overview\r\nThe REST APIs provide programmatic access to read and write BeezUP data. \r\n\r\nThis API have to be implemented by the marketplaces to be able to receive/send data from BeezUP.\r\n\r\n\r\nThe main features are:\r\n- Receive merchant feeds (products and offers)\r\n- Fetch merchant orders\r\n- Receive merchant order changes\r\n- ...\r\n\r\n\r\n## Things to keep in mind\r\n### Media type\r\nThe default media type for requests and responses is application/json. Where noted, some operations support other content types. If no additional content type is mentioned for a specific operation, then the media type is application/json.\r\n\r\n### Required content type\r\nThe required and default encoding for the request and responses is UTF8.\r\n\r\n### Required date time format\r\nAll our date time are formatted in ISO 8601 format: 2014-06-24T16:25:00Z.\r\n\r\n### Base URL\r\nAll URLs returned by the BeezUP API are relative to this base URL, and all requests to the REST API must use this base URL template.\r\n\r\nYou can test our API on https://mkp-adpt-api-docs.beezup.com/swagger-ui\\\\\r\nYou can contact us on [gitter, #BeezUP/API](https://gitter.im/BeezUP/API)\r\n\r\n",
+    "version": "2.0",
+    "x-logo": {
+      "url": "https://avatars0.githubusercontent.com/u/25665430",
+      "backgroundColor": "#FFFFFF"
+    },
+    "contact": {
+      "email": "help@beezup.com"
+    },
+    "license": {
+      "name": "BeezUP",
+      "url": "http://www.beezup.com"
+    }
+  },
+  "host": "mkpapigateway.beezup.com",
+  "x-beezup-ops": {
+    "codeGenType": "webapi",
+    "repo": "BeezUP",
+    "product": "BeezUP",
+    "group": "adpt-feedpub",
+    "applicationShortName": "MKP.ADPT.Feeds.WS",
+    "appRoot": "BZ.MKP.ADPT.Feeds.WebService",
+    "namespace": "BZ.MKP.ADPT.Feeds.WebService",
+    "apiName": "MkpGatewayOffersV1",
+    "useBeezUPFrameworkVersion2": true,
+    "comment": "First document\n",
+    "using": [
+      "BeezUP2.Framework.Messaging",
+      "BeezUP2.Framework.Business",
+      "BeezUP2.MKP.Feeds.Schemas",
+      "BeezUP2.MKP.Feeds.Messages"
+    ],
+    "packages": [
+      "BeezUPWebApi"
+    ]
+  },
+  "x-basePath": "/marketplace/feeds/v1",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Marketplace Gateway API - Feeds - Publication",
+      "x-displayName": "Publication"
+    },
+    {
+      "name": "Marketplace Gateway API - Orders - Order Management",
+      "x-displayName": "Order Management"
+    }
+  ],
+  "parameters": {
+    "marketplaceBusinessCodeParameter": {
+      "name": "marketplaceBusinessCode",
+      "in": "path",
+      "required": true,
+      "type": "string"
+    },
+    "accountIdParameter": {
+      "name": "accountId",
+      "in": "path",
+      "required": true,
+      "type": "integer"
+    },
+    "publicationIdParameter": {
+      "name": "publicationId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "guid"
+    },
+    "credentialParameter": {
+      "name": "x-BeezUP-Credential",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
+    },
+    "executionIdParameter": {
+      "name": "executionId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "guid"
+    },
+    "marketplaceOrderIdParameter": {
+      "name": "marketplaceOrderId",
+      "description": "The marketplace order identifier",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MarketplaceOrderId",
+      "x-example": "M1234X10"
+    },
+    "correlationIdParameter": {
+      "name": "correlationId",
+      "in": "path",
+      "type": "string",
+      "format": "CorrelationId",
+      "required": true,
+      "description": "It's the guid corresponding to the operation.\n"
+    },
+    "pageNumberQueryStringParameter": {
+      "name": "pageNumber",
+      "description": "The page number you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 1,
+      "x-minimum": 1,
+      "x-example": 1
+    },
+    "pageSizeQueryStringParameter": {
+      "name": "pageSize",
+      "description": "The entry count you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 25,
+      "x-minimum": 25,
+      "maximum": 100,
+      "x-maximum": 100,
+      "x-example": 25
+    },
+    "ifNoneMatchParameter": {
+      "name": "If-None-Match",
+      "type": "string",
+      "in": "header",
+      "required": false,
+      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+    },
+    "ifMatchParameter": {
+      "name": "If-Match",
+      "in": "header",
+      "type": "string",
+      "required": true,
+      "description": "ETag value to identify the last known version of requested resource.\\\nTo ensure that you are making a change on the lastest version of the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+    },
+    "acceptLanguageParameter": {
+      "name": "Accept-Language",
+      "description": "Indicates that the client accepts the following languages.",
+      "in": "header",
+      "required": false,
+      "type": "array",
+      "collectionFormat": "csv",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptEncodingRequiredParameter": {
+      "name": "Accept-Encoding",
+      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "array",
+      "collectionFormat": "csv",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptEncodingOptionalParameter": {
+      "name": "Accept-Encoding",
+      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
+      "in": "header",
+      "required": false,
+      "type": "array",
+      "collectionFormat": "csv",
+      "items": {
+        "type": "string"
+      }
+    },
+    "walletPropertyCodeParameter": {
+      "name": "walletPropertyCode",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "The wallet document code"
+    },
+    "marketplaceCodeParameter": {
+      "format": "MarketplaceCode",
+      "name": "marketplaceCode",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "The marketplace code"
+    },
+    "merchantCodeParameter": {
+      "format": "MerchantCode",
+      "name": "merchantCode",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "The merchant code"
+    },
+    "storeIdOnlyGeneralParameters": {
+      "name": "storeId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "guid",
+      "description": "Your store identifier"
+    },
+    "pageNumberQueryStrngParameter": {
+      "name": "pageNumber",
+      "description": "The page number you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 1,
+      "x-example": 1
+    },
+    "pageSizeQueryStrngParameter": {
+      "name": "pageSize",
+      "description": "The entry count you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 25,
+      "maximum": 100,
+      "x-example": 25
+    }
+  },
+  "paths": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/health": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Ping the status of your feed system",
+        "operationId": "PingGatewayFeedApi",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The status of the API is up!",
+            "schema": {
+              "$ref": "#/definitions/healthCheck"
+            }
+          },
+          "503": {
+            "description": "The status of your API is down..."
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/start": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Start the feed publication",
+        "operationId": "StartFeedPublication",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/startFeedPublicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The feed publication has been started!"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode and AccountId is invalid"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/complete": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Complete the feed publication",
+        "operationId": "CompleteFeedPublication",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/completeFeedPublicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The feed comands has been completed!"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/messages": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Push a batch of feed messages",
+        "operationId": "PushMerchantFeedMessages",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "name": "Accept-Encoding",
+            "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "collectionFormat": "csv",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/pushFeedMessagesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The feed messages have been registered!"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/status": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "x-tagGroups": "Publication",
+        "operationId": "CheckPublicationStatus",
+        "summary": "Check the publication status",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publication status retrieved",
+            "schema": {
+              "$ref": "#/definitions/checkFeedPublicationStatusResponse"
+            }
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          },
+          "409": {
+            "description": "Publication status not yet available"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/reporting": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "x-tagGroups": "Publication",
+        "operationId": "GetPublicationReporting",
+        "summary": "Get the publication reporting",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The error reporting is retrieved",
+            "schema": {
+              "$ref": "#/definitions/getFeedPublicationReportingResponse"
+            }
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          },
+          "409": {
+            "description": "Reporting not yet available"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/exchangedMessages": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "x-tagGroups": "Publication",
+        "operationId": "GetPublicationExchangedMessages",
+        "summary": "Get the publication exchanged messages with the marketplace",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The exchanged messages are retrieved",
+            "schema": {
+              "$ref": "#/definitions/getFeedPublicationExchangedMessagesResponse"
+            }
+          },
+          "404": {
+            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          },
+          "409": {
+            "description": "Reporting not yet available"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/ping": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "summary": "Ping the status of your order management system",
+        "operationId": "PingGatewayOrderApi",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The status of the API is up!"
+          },
+          "503": {
+            "description": "The status of your API is down..."
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/list": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "summary": "Get order list",
+        "description": "RECOMMANDATION: We recommend to always use the orderMarketplaceLastModificationUtcDate to get from the marketplace and sort the response to BeezUP.\n",
+        "operationId": "GetOrderList",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "name": "pageNumber",
+            "description": "The page number of the order list",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "x-example": 1
+          },
+          {
+            "name": "pageSize",
+            "description": "The expected order count in the order list",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "minimum": 25,
+            "maximum": 2000,
+            "x-example": 25
+          },
+          {
+            "name": "orderMarketplaceLastModificationUtcDate",
+            "description": "The marketplace last modification utc date already received by BeezUP. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "x-example": "2019-06-24T23:03:12.123Z"
+          },
+          {
+            "name": "orderLastPurchaseUtcDate",
+            "description": "The order last purchase UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "x-example": "2019-06-24T23:03:12.123Z"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order list is retrieved",
+            "schema": {
+              "$ref": "#/definitions/marketplaceOrderList"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "summary": "Get order",
+        "operationId": "GetOrder",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/executionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
+          },
+          {
+            "name": "If-None-Match",
+            "type": "string",
+            "in": "header",
+            "required": false,
+            "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order is retrieved",
+            "schema": {
+              "$ref": "#/definitions/marketplaceOrder"
+            }
+          },
+          "304": {
+            "$ref": "#/responses/304_NotModified"
+          },
+          "404": {
+            "description": "Order not found",
+            "schema": {
+              "$ref": "#/definitions/errorResponseMessage"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/message": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "summary": "Push an  order change message",
+        "operationId": "PushOrderChangeMessage",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/executionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/orderChangeMessage"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The order change message have been accepted, please check the order change status response."
+          },
+          "404": {
+            "description": "Order or execution not found",
+            "schema": {
+              "$ref": "#/definitions/errorResponseMessage"
+            }
+          },
+          "400": {
+            "description": "The request contains bad parameters",
+            "schema": {
+              "$ref": "#/definitions/errorResponseMessage"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/status": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "x-tagGroups": "Order Management",
+        "operationId": "CheckOrderChangeStatus",
+        "summary": "Check the order change status",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
+          },
+          {
+            "$ref": "#/parameters/executionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order change status retrieved",
+            "schema": {
+              "$ref": "#/definitions/orderChangeStatusResponse"
+            }
+          },
+          "404": {
+            "description": "Order or execution not found",
+            "schema": {
+              "$ref": "#/definitions/errorResponseMessage"
+            }
+          },
+          "409": {
+            "description": "Order change status not yet available"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/exchangedMessages": {
+      "get": {
+        "tags": [
+          "Marketplace Gateway API - Orders - Order Management"
+        ],
+        "x-tagGroups": "Order Management",
+        "operationId": "GetOrderChangeExchangedMessages",
+        "summary": "Get the order change exchanged messages with the marketplace",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
+          },
+          {
+            "$ref": "#/parameters/executionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The exchanged messages are retrieved",
+            "schema": {
+              "$ref": "#/definitions/marketplaceOrderChangeStatus"
+            }
+          },
+          "404": {
+            "description": "Order or execution not found",
+            "schema": {
+              "$ref": "#/definitions/errorResponseMessage"
+            }
+          },
+          "409": {
+            "description": "Exchanged messages not yet available"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "marketplaceOrderList": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marketplaceOrder"
+          }
+        }
+      }
+    },
+    "marketplaceOrder": {
+      "type": "object",
+      "required": [
+        "marketplaceOrderId",
+        "orderPurchaseUtcDate",
+        "marketplaceOrderStatus",
+        "marketplaceOrderLastModificationUtcDate",
+        "marketplaceOrderETag",
+        "properties",
+        "items"
+      ],
+      "properties": {
+        "marketplaceOrderId": {
+          "$ref": "#/definitions/marketplaceOrderId"
+        },
+        "orderPurchaseUtcDate": {
+          "$ref": "#/definitions/orderPurchaseUtcDate"
+        },
+        "marketplaceOrderStatus": {
+          "$ref": "#/definitions/marketplaceOrderStatus"
+        },
+        "marketplaceOrderLastModificationUtcDate": {
+          "$ref": "#/definitions/marketplaceOrderLastModificationUtcDate"
+        },
+        "marketplaceOrderETag": {
+          "$ref": "#/definitions/marketplaceOrderETag"
+        },
+        "properties": {
+          "$ref": "#/definitions/marketplaceOrderProperties"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marketplaceOrderItem"
+          }
+        }
+      }
+    },
+    "marketplaceOrderProperties": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "orderChangeMessage": {
+      "type": "object",
+      "required": [
+        "beezUPOrderChangeType",
+        "marketplaceOrderItems"
+      ],
+      "properties": {
+        "beezUPOrderChangeType": {
+          "$ref": "#/definitions/beezUPOrderChangeType"
+        },
+        "parameters": {
+          "$ref": "#/definitions/orderChangeParameters"
+        },
+        "marketplaceOrderItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/marketplaceOrderItem"
+          }
+        }
+      }
+    },
+    "marketplaceOrderItem": {
+      "type": "object",
+      "required": [
+        "properties"
+      ],
+      "properties": {
+        "marketplaceOrderItemId": {
+          "$ref": "#/definitions/marketplaceOrderItemId"
+        },
+        "properties": {
+          "$ref": "#/definitions/marketplaceOrderItemProperties"
+        }
+      }
+    },
+    "marketplaceOrderItemProperties": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "orderChangeParameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "beezUPOrderChangeType": {
+      "type": "string"
+    },
+    "marketplaceOrderChangeType": {
+      "type": "string"
+    },
+    "marketplaceOrderId": {
+      "description": "The marketplace order identifier",
+      "type": "string"
+    },
+    "orderPurchaseUtcDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "marketplaceOrderLastModificationUtcDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "marketplaceOrderStatus": {
+      "type": "string"
+    },
+    "marketplaceOrderItemId": {
+      "type": "string"
+    },
+    "orderChangeStatusResponse": {
+      "type": "object",
+      "required": [
+        "beezUPOrderChangeStatus"
+      ],
+      "properties": {
+        "marketplaceOrderChangeStatus": {
+          "$ref": "#/definitions/marketplaceOrderChangeStatus"
+        },
+        "beezUPOrderChangeStatus": {
+          "$ref": "#/definitions/beezUPOrderChangeStatus"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "marketplaceOrderChangeStatus": {
+      "type": "string"
+    },
+    "beezUPOrderChangeStatus": {
+      "type": "string",
+      "enum": [
+        "InProgress",
+        "Succeed",
+        "Failed"
+      ]
+    },
+    "marketplaceOrderETag": {
+      "type": "string"
+    },
+    "startFeedPublicationRequest": {
+      "type": "object",
+      "required": [
+        "feedType"
+      ],
+      "properties": {
+        "feedType": {
+          "$ref": "#/definitions/feedMessageType"
+        }
+      }
+    },
+    "completeFeedPublicationRequest": {
+      "type": "object",
+      "required": [
+        "processingStatus"
+      ],
+      "properties": {
+        "processingStatus": {
+          "$ref": "#/definitions/processingStatus"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "errorId": {
+          "type": "string"
+        }
+      }
+    },
+    "pushFeedMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feedMessage"
+          }
+        }
+      }
+    },
+    "checkFeedPublicationStatusResponse": {
+      "description": "Publication Status Response",
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/feedPublicationStatus"
+        },
+        "globalReportings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reportingItem"
+          }
+        }
+      }
+    },
+    "getFeedPublicationReportingResponse": {
+      "description": "Publication Reporting Response",
+      "type": "object",
+      "properties": {
+        "feedReportings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/feedReporting"
+          }
+        }
+      }
+    },
+    "getFeedPublicationExchangedMessagesResponse": {
+      "description": "Publication Exchanged Messages Response",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publicationExchangedMessage"
+      }
+    },
+    "feedType": {
+      "type": "string",
+      "enum": [
+        "products",
+        "offers"
+      ]
+    },
+    "feedMessageType": {
+      "type": "string",
+      "enum": [
+        "publish",
+        "unpublish"
+      ]
+    },
+    "reportingType": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warning"
+      ],
+      "default": "error"
+    },
+    "feedPublicationStatus": {
+      "type": "string",
+      "enum": [
+        "notStarted",
+        "inProgress",
+        "success",
+        "failed"
+      ],
+      "default": "notStarted"
+    },
+    "operationName": {
+      "type": "string",
+      "enum": [
+        "pingGatewayFeedApi",
+        "startFeedPublication",
+        "completeFeedPublication",
+        "pushMerchantFeedMessages",
+        "checkPublicationStatus",
+        "getPublicationReporting",
+        "getPublicationExchangedMessages"
+      ],
+      "default": "pushMerchantFeedMessages"
+    },
+    "feedMessage": {
+      "type": "object",
+      "discriminator": "messageType",
+      "properties": {
+        "sku": {
+          "$ref": "#/definitions/sku"
+        },
+        "messageType": {
+          "$ref": "#/definitions/feedMessageType"
+        }
+      }
+    },
+    "feedMetadata": {
+      "type": "object",
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The marketplace column name"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "publishFeed": {
+      "x-exclude": true,
+      "allOf": [
+        {
+          "$ref": "#/definitions/feedMessage"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "description": "where key is the marketplace column name",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/feedMetadata"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "unpublishFeed": {
+      "x-exclude": true,
+      "allOf": [
+        {
+          "$ref": "#/definitions/feedMessage"
+        }
+      ]
+    },
+    "reportingItem": {
+      "type": "object",
+      "required": [
+        "reportingType",
+        "code",
+        "message"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/reportingType"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "feedReporting": {
+      "type": "object",
+      "required": [
+        "sku",
+        "reportings"
+      ],
+      "properties": {
+        "sku": {
+          "$ref": "#/definitions/sku"
+        },
+        "reportings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/reportingItem"
+          }
+        }
+      }
+    },
+    "publicationExchangedMessagesItem": {
+      "type": "object",
+      "required": [
+        "marketplaceOperationName",
+        "requestUri",
+        "responseUri",
+        "requestUtcDate",
+        "responseUtcDate"
+      ],
+      "properties": {
+        "marketplaceOperationName": {
+          "type": "string"
+        },
+        "requestUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "responseUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "requestUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "responseUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "publicationExchangedMessage": {
+      "type": "object",
+      "required": [
+        "operationName"
+      ],
+      "properties": {
+        "operationName": {
+          "$ref": "#/definitions/operationName"
+        },
+        "exchangedMessages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/publicationExchangedMessagesItem"
+          }
+        }
+      }
+    },
+    "deliveryMethod": {
+      "type": "string",
+      "description": "A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer. Delivery methods are characterized by the means of transportation used, and by the organization or group that is the contracting party for the sending organization or person."
+    },
+    "ecommerceSoftwareName": {
+      "description": "The e-commerce software name of the merchant",
+      "type": "string",
+      "example": "Prestashop"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "The first name of a person",
+      "example": "Marilyne"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "The last name of a person",
+      "example": "Monroe"
+    },
+    "userName": {
+      "description": "User Name",
+      "type": "string"
+    },
+    "userIPAddress": {
+      "description": "User IP Address",
+      "type": "string"
+    },
+    "correlationId": {
+      "x-exclude": true,
+      "description": "The correlation identifier. It's a guid.",
+      "format": "CorrelationId",
+      "type": "string",
+      "example": "b0d3faea-f881-439f-ba92-02b1168511ea"
+    },
+    "messageId": {
+      "x-exclude": true,
+      "description": "The message identifier. It's a guid.",
+      "format": "MessageId",
+      "type": "string",
+      "example": "b0d3faea-f881-439f-ba92-02b1168511ea"
+    },
+    "causeId": {
+      "x-exclude": true,
+      "description": "The cause identifier. It's a guid.",
+      "format": "CauseId",
+      "type": "string",
+      "example": "b0d3faea-f881-439f-ba92-02b1168511ea"
+    },
+    "merchantCode": {
+      "type": "string",
+      "description": "The merchant code identifier in IMN",
+      "pattern": "^([A-Z|0-9]){5}$",
+      "x-pattern": "^([A-Z|0-9]){5}$",
+      "example": "MLT01"
+    },
+    "marketplaceCode": {
+      "type": "string",
+      "description": "The marketplace code identifier in IMN.\nFor now we have:\n- C1 for Cdiscount\n- E1 for ePrice\n- R1 for Real.DE\n- B1 for BOL\n- E2 for eMAG\n",
+      "pattern": "^([A-Z]|[0-9]){2}$",
+      "x-pattern": "^([A-Z]|[0-9]){2}$",
+      "example": "C1"
+    },
+    "marketplaceMerchantCode": {
+      "type": "string",
+      "description": "The merchant code for a marketplace",
+      "example": "005145"
+    },
+    "paginationRequestParameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "$ref": "#/definitions/pageSize"
+        },
+        "pageNumber": {
+          "$ref": "#/definitions/pageNumber"
+        }
+      }
+    },
+    "pageSize": {
+      "x-exclude": true,
+      "description": "Indicate the item count per page",
+      "type": "integer",
+      "format": "int32",
+      "default": 100,
+      "minimum": 25,
+      "x-minimum": 25,
+      "maximum": 100,
+      "x-maximum": 100,
+      "example": 100
+    },
+    "pageNumber": {
+      "x-exclude": true,
+      "description": "Indicates the page number",
+      "format": "int32",
+      "type": "integer",
+      "example": 1,
+      "minimum": 1,
+      "x-minimum": 1,
+      "default": 1
+    },
+    "productFilterOperatorName": {
+      "type": "string",
+      "description": "Indicate the operator you want to make on the columnId",
+      "enum": [
+        "Equals",
+        "Contains",
+        "GreaterTo",
+        "LowerTo",
+        "InList",
+        "IsNull",
+        "IsNotNull"
+      ]
+    },
+    "sku": {
+      "type": "string",
+      "description": "The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. http://schema.org/sku",
+      "maxLength": 50
+    },
+    "ean": {
+      "type": "string",
+      "description": "European Article Number",
+      "maxLength": 128
+    },
+    "gtin": {
+      "type": "string",
+      "description": "Global Trade Item Number (GTIN) of the item.\nSupported values:\n\n- UPC (in North America / GTIN-12)\n12-digit number like 323456789012\n8-digit UPC-E codes should be converted to 12-digit codes\n- EAN (in Europe / GTIN-13)\n13-digit number like 3001234567892\n- JAN (in Japan / GTIN-13)\n8 or 13-digit number like 49123456 or 4901234567894\n- ISBN (for books)\n10 or 13-digit number like 1455582344 or 978-1455582341. If you have both, only include the 13-digit number. ISBN-10 are deprecated and should be converted to ISBN-13\n- ITF-14 (for multipacks / GTIN-14)\n14-digit number like 10856435001702\n\nSchema.org property:\n- [Offer.gtin8](http://schema.org/gtin8)\n- [Offer.gtin12](http://schema.org/gtin12)\n- [Offer.gtin13](http://schema.org/gtin13)\n- [Offer.gtin14](http://schema.org/gtin14)\n- [Offer.isbn](http://schema.org/isbn)\n",
+      "maxLength": 50
+    },
+    "productBasicInfo": {
+      "description": "The basic information related to a product",
+      "type": "object",
+      "required": [
+        "productId",
+        "productSku",
+        "productTitle",
+        "productImageUrl",
+        "productExists"
+      ],
+      "properties": {
+        "productId": {
+          "format": "guid",
+          "type": "string",
+          "description": "The product identifier",
+          "example": "00000000-0000-0000-0000-000000000000"
+        },
+        "productSku": {
+          "type": "string",
+          "description": "The product SKU",
+          "example": "SKU1234"
+        },
+        "productTitle": {
+          "type": "string",
+          "description": "The product tile",
+          "example": "My supert product"
+        },
+        "productImageUrl": {
+          "type": "string",
+          "format": "HttpUrl",
+          "description": "The product image Url",
+          "example": "http://i2.cdscdn.com/pdt2/3/9/0/1/550x550/hai6901018043390/rw/haier-b20fwrss-refrigerateur-americain.jpg"
+        },
+        "productExists": {
+          "type": "boolean",
+          "description": "Indicates if the product still exists in your catalog",
+          "example": true
+        }
+      }
+    },
+    "countryIsoCodeAlpha3": {
+      "description": "The country iso code alpha 3 <a href=\"https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3\">(ISO 3166-1_alpha-3)</a>",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "x-pattern": "^[A-Z]{3}$",
+      "x-lov": "Country",
+      "example": "FRA"
+    },
+    "currencyCode": {
+      "x-exclude": true,
+      "description": "The currency code <a href=\"https://en.wikipedia.org/wiki/ISO_4217\">(ISO 4217)</a>\n",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "x-pattern": "^[A-Z]{3}$",
+      "example": "EUR"
+    },
+    "email": {
+      "x-exclude": true,
+      "description": "The email",
+      "format": "email",
+      "pattern": "^(.+)@(.+)$",
+      "x-pattern": "^(.+)@(.+)$",
+      "example": "paulsimon@mysupercompany.com"
+    },
+    "userId": {
+      "x-exclude": true,
+      "format": "guid",
+      "description": "The user identifier",
+      "type": "string",
+      "example": "8a7fbdec-9e71-472e-9974-27d5c1d57cf8"
+    },
+    "productId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The product identifier",
+      "example": "578419df-1bbf-41a6-96fa-862e42182b67"
+    },
+    "listOfValueItem": {
+      "description": "This object is used by LOV apis",
+      "type": "object",
+      "required": [
+        "codeIdentifier",
+        "intIdentifier"
+      ],
+      "properties": {
+        "position": {
+          "format": "int32",
+          "type": "integer",
+          "example": 1
+        },
+        "codeIdentifier": {
+          "type": "string",
+          "example": "FRA"
+        },
+        "translationText": {
+          "type": "string",
+          "example": "France"
+        },
+        "intIdentifier": {
+          "format": "int32",
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "paginationResult": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "entryCount",
+        "pageCount",
+        "totalEntryCount",
+        "links"
+      ],
+      "properties": {
+        "entryCount": {
+          "type": "integer",
+          "description": "The entry count currently returned",
+          "example": 25,
+          "minimum": 0
+        },
+        "pageCount": {
+          "type": "integer",
+          "description": "The page count",
+          "example": 38,
+          "minimum": 0
+        },
+        "totalEntryCount": {
+          "type": "integer",
+          "description": "The total entry count",
+          "example": 943,
+          "minimum": 0
+        },
+        "links": {
+          "$ref": "#/definitions/paginationResultLinks"
+        }
+      },
+      "example": {
+        "entryCount": 25,
+        "pageCount": 38,
+        "totalEntryCount": 943,
+        "links": {
+          "first": {
+            "href": "/merchant/orders/v1/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 1
+                }
+              }
+            ]
+          },
+          "last": {
+            "href": "/merchant/orders/v1/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 38
+                }
+              }
+            ]
+          },
+          "next": {
+            "href": "/merchant/orders/v1/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 2
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "paginationResultLinks": {
+      "x-exclude": true,
+      "description": "The navigation links 'first', 'last', 'next', 'previous'",
+      "type": "object",
+      "required": [
+        "first",
+        "last"
+      ],
+      "properties": {
+        "first": {
+          "$ref": "#/definitions/link3"
+        },
+        "last": {
+          "$ref": "#/definitions/link3"
+        },
+        "previous": {
+          "$ref": "#/definitions/link3"
+        },
+        "next": {
+          "$ref": "#/definitions/link3"
+        }
+      }
+    },
+    "href": {
+      "x-exclude": true,
+      "type": "string",
+      "example": "/merchant/orders/v1/{marketplaceCode}/{IMNOrderId}",
+      "description": "Indicate the relative uri for this link"
+    },
+    "operationId": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "The operationId to call.",
+      "example": "GetOrder"
+    },
+    "httpMethod": {
+      "x-exclude": true,
+      "type": "string",
+      "enum": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE",
+        "PUT",
+        "HEAD"
+      ],
+      "default": "GET",
+      "example": "GET",
+      "description": "Indicate the http method to use on this link"
+    },
+    "link3": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "docUrl": {
+          "$ref": "#/definitions/docUrl"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the link",
+          "example": "This is a description link"
+        },
+        "href": {
+          "$ref": "#/definitions/href"
+        },
+        "operationId": {
+          "$ref": "#/definitions/operationId"
+        },
+        "method": {
+          "$ref": "#/definitions/httpMethod"
+        },
+        "parameters": {
+          "$ref": "#/definitions/linkParameter3Types"
+        },
+        "urlTemplated": {
+          "type": "boolean",
+          "description": "indicates whether the href is templated or not"
+        },
+        "allRequiredParamsProvided": {
+          "type": "boolean",
+          "description": "indicates whether all required params have been provided"
+        },
+        "allOptionalParamsProvided": {
+          "type": "boolean",
+          "description": "indicates whether all optionals params have been provided"
+        },
+        "info": {
+          "$ref": "#/definitions/infoSummaries"
+        }
+      }
+    },
+    "linkParameter3Types": {
+      "x-exclude": true,
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/linkParameter3"
+      }
+    },
+    "parameterIn": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "* path: if the parameter must be pass in the path uri\n* header: if the parameter must be passed in http header\n* query: if the parameter must be passed in querystring\n* body: if the parameter must be passed in the body\n* file: if the parameter must be passed in a multipart/form-data (https://swagger.io/docs/specification/2-0/file-upload/)\n",
+      "example": "path",
+      "enum": [
+        "path",
+        "header",
+        "query",
+        "body",
+        "file"
+      ]
+    },
+    "parameterType": {
+      "x-exclude": true,
+      "description": "The value type of the parameter",
+      "type": "string",
+      "enum": [
+        "string",
+        "integer",
+        "number",
+        "boolean",
+        "object",
+        "array",
+        "date",
+        "date-time",
+        "file"
+      ],
+      "default": "string",
+      "example": "string"
+    },
+    "linkParameter3": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "in"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link parameter. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "value": {
+          "type": "object",
+          "description": "The value of the parameter. It can be an integer a string or an object.",
+          "example": "1234"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "example": true
+        },
+        "in": {
+          "$ref": "#/definitions/parameterIn"
+        },
+        "lovLink": {
+          "$ref": "#/definitions/LOVLink3"
+        },
+        "lovRequired": {
+          "type": "boolean",
+          "description": "If true, you MUST indicate a value from the list of values otherwise it's a freetext",
+          "example": true
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the parameter",
+          "example": "the store identifier"
+        },
+        "schema": {
+          "type": "string",
+          "description": "schema of the parameter",
+          "example": "orderListRequest"
+        },
+        "pattern": {
+          "$ref": "#/definitions/validationPattern"
+        },
+        "properties": {
+          "description": "If the parameter is an object with flexible properties (additionProperties/dictionary), we will describe the properties of the object.",
+          "additionalProperties": {
+            "$ref": "#/definitions/linkParameterProperty3"
+          },
+          "example": {
+            "shipOrder": {
+              "type": "â€‹string"
+            }
+          }
+        }
+      }
+    },
+    "validationPattern": {
+      "type": "string",
+      "description": "The regular expression to validate the value",
+      "example": "*.-api$"
+    },
+    "linkParameterProperty3": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link parameter property. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "value": {
+          "type": "object",
+          "description": "The value of the parameter. It can be an integer a string or an object.",
+          "example": "1234"
+        },
+        "required": {
+          "type": "boolean",
+          "example": true
+        },
+        "type": {
+          "$ref": "#/definitions/parameterType"
+        },
+        "lovLink": {
+          "$ref": "#/definitions/LOVLink3"
+        },
+        "lovRequired": {
+          "type": "boolean",
+          "description": "If true, you MUST use indicate a value from the list of values otherwise it's a freetext",
+          "example": true
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the parameter",
+          "example": "the store identifier"
+        },
+        "schema": {
+          "type": "string",
+          "description": "schema of the parameter",
+          "example": "orderListRequest"
+        },
+        "pattern": {
+          "$ref": "#/definitions/validationPattern"
+        }
+      }
+    },
+    "LOVLink2": {
+      "description": "Describe the way you have to follow to get access to the LOV",
+      "x-deprecated": true,
+      "type": "object",
+      "required": [
+        "listName"
+      ],
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "Indicate the relation name related to the link",
+          "example": "LOV_Go2CultureName"
+        },
+        "href": {
+          "type": "string",
+          "example": "/merchant/lov/v1/{listName}",
+          "description": "Indicate the relative uri pattern to the list of value"
+        },
+        "listName": {
+          "type": "string",
+          "description": "The name of the list of value",
+          "example": "Go2CultureName"
+        }
+      }
+    },
+    "LOVLink3": {
+      "x-exclude": true,
+      "description": "Describe the way you have to follow to get access to the LOV",
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "format": "uri",
+          "example": "/merchant/lov/v1/Go2CultureName",
+          "description": "Indicate the uri to the list of value"
+        },
+        "method": {
+          "$ref": "#/definitions/httpMethod"
+        }
+      }
+    },
+    "httpUrl": {
+      "x-exclude": true,
+      "description": "The URL <a href=\"https://en.wikipedia.org/wiki/URL\">https://en.wikipedia.org/wiki/URL</a>",
+      "type": "string",
+      "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "x-pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "example": "http://www.mydomain.com"
+    },
+    "errorResponseMessage": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "errors"
+      ],
+      "properties": {
+        "errors": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/userErrorMessage"
+          }
+        }
+      }
+    },
+    "docUrl": {
+      "x-exclude": true,
+      "type": "string",
+      "format": "uri",
+      "description": "The documentation related to this operation.",
+      "example": "https://api-docs.imn.io/#operation/EnableChannelCatalog"
+    },
+    "errorCode": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "the error code. The error code can be a pattern containing the argument's name",
+      "example": "CatalogImportationAlreadyInProgress(ExecutionId currentCatalogImportationId)"
+    },
+    "cultureName": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "If the error is translated, the culture name will be indicated",
+      "example": "en",
+      "x-lov": "Go2CultureName"
+    },
+    "userErrorMessage": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "docUrl": {
+          "$ref": "#/definitions/docUrl"
+        },
+        "code": {
+          "$ref": "#/definitions/errorCode"
+        },
+        "message": {
+          "type": "string",
+          "description": "The error message",
+          "example": "There is already an importation in progress: b24d0dd8-a561-478a-9b26-34f573f03527\n"
+        },
+        "cultureName": {
+          "$ref": "#/definitions/cultureName"
+        },
+        "arguments": {
+          "$ref": "#/definitions/userErrorMessageArguments"
+        }
+      }
+    },
+    "userErrorMessageArguments": {
+      "x-exclude": true,
+      "type": "object",
+      "description": "a dictionary string/object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "exceptionDetail": {
+      "type": "object",
+      "properties": {
+        "helpLink": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "infoSummaries": {
+      "type": "object",
+      "properties": {
+        "successes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/successSummary"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/errorSummary"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/warningSummary"
+          }
+        },
+        "informations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/infoSummary"
+          }
+        }
+      }
+    },
+    "successSummary": {
+      "type": "object",
+      "properties": {
+        "successCode": {
+          "type": "string"
+        },
+        "successMessage": {
+          "type": "string"
+        },
+        "successArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        }
+      }
+    },
+    "errorSummary": {
+      "type": "object",
+      "properties": {
+        "utcDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "errorGuid": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "technicalErrorMessage": {
+          "type": "string"
+        },
+        "exceptionDetail": {
+          "$ref": "#/definitions/exceptionDetail"
+        },
+        "errorArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "warningSummary": {
+      "type": "object",
+      "properties": {
+        "technicalErrorMessage": {
+          "type": "string"
+        },
+        "warningMessage": {
+          "type": "string"
+        },
+        "warningCode": {
+          "type": "string"
+        },
+        "warningArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "infoSummary": {
+      "type": "object",
+      "properties": {
+        "informationCode": {
+          "type": "string"
+        },
+        "informationMessage": {
+          "type": "string"
+        },
+        "informationArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        }
+      }
+    },
+    "marketplaceApiCredential": {
+      "description": "The API credentials of the merchant on his marketplace.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "example": {
+          "login": "mylogin",
+          "password": "myPassword"
+        }
+      }
+    },
+    "merchantMarketplaceBase": {
+      "type": "object",
+      "required": [
+        "merchantCode",
+        "marketplaceCode"
+      ],
+      "properties": {
+        "merchantCode": {
+          "$ref": "#/definitions/merchantCode"
+        },
+        "marketplaceCode": {
+          "$ref": "#/definitions/marketplaceCode"
+        }
+      }
+    },
+    "sort": {
+      "x-excludeSql": true,
+      "type": "string",
+      "default": "ascending",
+      "enum": [
+        "ascending",
+        "descending"
+      ]
+    },
+    "operationSourceType": {
+      "description": "Indicates the origin of the operation:\n* api: the operation has been done using our api directly.\n* ui: the operation has been done using our user interface. \n",
+      "type": "string",
+      "enum": [
+        "api",
+        "ui"
+      ],
+      "example": "api"
+    },
+    "processingStatus": {
+      "x-exclude": true,
+      "description": "The processing status of an operation",
+      "type": "string",
+      "enum": [
+        "none",
+        "inProgress",
+        "done",
+        "failed",
+        "aborted"
+      ]
+    },
+    "healthCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Health check name",
+          "example": "MyDatabaseCheck"
+        },
+        "message": {
+          "type": "string",
+          "description": "Gets the status message of the check.",
+          "example": "Database connection OK"
+        },
+        "status": {
+          "$ref": "#/definitions/healthCheckStatus"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "healthCheckStatus": {
+      "type": "string",
+      "description": "Possible status values of a health check result.\n* degraded:  The check is degraded, failing but not critical\n* healthy: The check is healthy\n* ignored: The check was ignored\n* unhealthy:  The check is unhealthy\n",
+      "enum": [
+        "degraded",
+        "healthy",
+        "ignored",
+        "unhealthy"
+      ]
+    },
+    "messageBase": {
+      "x-exclude": true,
+      "type": "object",
+      "required": [
+        "messageId",
+        "correlationId"
+      ],
+      "properties": {
+        "messageId": {
+          "allOf": [
+            {
+              "x-excludeProperty": true
+            },
+            {
+              "$ref": "#/definitions/messageId"
+            }
+          ]
+        },
+        "correlationId": {
+          "$ref": "#/definitions/correlationId"
+        },
+        "causeId": {
+          "$ref": "#/definitions/causeId"
+        }
+      }
+    },
+    "eventType": {
+      "x-exclude": true,
+      "description": "The event type",
+      "type": "string"
+    },
+    "eventBase": {
+      "x-exclude": true,
+      "allOf": [
+        {
+          "$ref": "#/definitions/messageBase"
+        },
+        {
+          "type": "object",
+          "discriminator": "eventType",
+          "required": [
+            "eventType"
+          ],
+          "properties": {
+            "eventType": {
+              "$ref": "#/definitions/eventType"
+            }
+          }
+        }
+      ]
+    },
+    "BeezUP.Common.PaginationRequestParameters": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "$ref": "#/definitions/BeezUP.Common.PageSize"
+        },
+        "pageNumber": {
+          "$ref": "#/definitions/BeezUP.Common.PageNumber"
+        }
+      }
+    },
+    "BeezUP.Common.PageSize": {
+      "description": "Indicate the item count per page",
+      "type": "integer",
+      "format": "int32",
+      "default": 100,
+      "minimum": 25,
+      "maximum": 100,
+      "example": 100
+    },
+    "BeezUP.Common.PageNumber": {
+      "description": "Indicates the page number",
+      "format": "int32",
+      "type": "integer",
+      "example": 1,
+      "minimum": 1,
+      "default": 1
+    },
+    "BeezUP.Common.CatalogCategoryFilter": {
+      "type": "object",
+      "properties": {
+        "categoryPath": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Indicates on which catalog category path you want to make the filter",
+          "example": [
+            "Maison",
+            "Chambre"
+          ]
+        }
+      }
+    },
+    "BeezUP.Common.ChannelCategoryFilter": {
+      "type": "object",
+      "properties": {
+        "categoryPath": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Indicates on which channel category path you want to make the filter",
+          "example": [
+            "Home",
+            "Bedroom"
+          ]
+        }
+      }
+    },
+    "BeezUP.Common.ProductFilters": {
+      "type": "object",
+      "properties": {
+        "sku": {
+          "type": "string",
+          "description": "The product sku filter",
+          "example": "M1234"
+        },
+        "title": {
+          "type": "string",
+          "description": "The product title filter",
+          "example": "RefrigÃ©rateur"
+        },
+        "additionalProductFilters": {
+          "$ref": "#/definitions/BeezUP.Common.AdditionalProductFilters"
+        }
+      }
+    },
+    "BeezUP.Common.AdditionalProductFiltersValue": {
+      "type": "object",
+      "properties": {
+        "operatorName": {
+          "$ref": "#/definitions/BeezUP.Common.ProductColumnFilterOperatorName"
+        },
+        "values": {
+          "description": "Must be null if the operator is \"IsNull\" or \"IsNotNull\".\nCan contains multiple value in case of \"InList\" operator. Otherwise a single value is expected.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "My value"
+          ]
+        }
+      },
+      "example": {
+        "672644c7-5bd0-4e25-88c1-1f732bda5e4c": {
+          "operatorName": "GreaterTo",
+          "values": [
+            100
+          ]
+        }
+      }
+    },
+    "BeezUP.Common.AdditionalProductFilters": {
+      "type": "object",
+      "description": "Describe a filter on a product's column.\nThe key is the column identifier of your catalog or a custom column.\n",
+      "additionalProperties": {
+        "$ref": "#/definitions/BeezUP.Common.AdditionalProductFiltersValue"
+      }
+    },
+    "BeezUP.Common.ProductColumnFilterOperatorName": {
+      "type": "string",
+      "description": "Indicate the operator you want to make on the columnId",
+      "x-lov": "ProductColumnFilterOperatorName"
+    },
+    "BeezUP.Common.ProductBasicInfo": {
+      "description": "The basic information related to a product",
+      "type": "object",
+      "required": [
+        "productId",
+        "productSku",
+        "productTitle",
+        "productExists"
+      ],
+      "properties": {
+        "productId": {
+          "format": "guid",
+          "type": "string",
+          "description": "The product identifier",
+          "example": "00000000-0000-0000-0000-000000000000"
+        },
+        "productSku": {
+          "type": "string",
+          "description": "The product SKU",
+          "example": "SKU1234"
+        },
+        "productTitle": {
+          "type": "string",
+          "description": "The product tile",
+          "example": "My supert product"
+        },
+        "productImageUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "The product image Url",
+          "example": "http://i2.cdscdn.com/pdt2/3/9/0/1/550x550/hai6901018043390/rw/haier-b20fwrss-refrigerateur-americain.jpg"
+        },
+        "productExists": {
+          "type": "boolean",
+          "description": "Indicates if the product still exists in your catalog",
+          "example": true
+        }
+      }
+    },
+    "BeezUP.Common.ChannelBasicInfo": {
+      "description": "The basic info related to a channel",
+      "type": "object",
+      "required": [
+        "channelId",
+        "channelName",
+        "channelImageUrl"
+      ],
+      "properties": {
+        "channelId": {
+          "$ref": "#/definitions/BeezUP.Common.ChannelId"
+        },
+        "channelName": {
+          "$ref": "#/definitions/BeezUP.Common.ChannelName"
+        },
+        "channelImageUrl": {
+          "$ref": "#/definitions/BeezUP.Common.HttpUrl"
+        }
+      }
+    },
+    "BeezUP.Common.CatalogColumnId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The catalog column identifier (catalog or custom column)",
+      "example": "bea7c21e-948b-4ac3-9ffd-4396e62c4163"
+    },
+    "BeezUP.Common.CatalogColumnUserName": {
+      "type": "string",
+      "description": "The catalog column named by the user (catalog or custom column)",
+      "example": "My title"
+    },
+    "BeezUP.Common.ChannelColumnName": {
+      "type": "string",
+      "description": "The channel column name",
+      "example": "NAME"
+    },
+    "BeezUP.Common.ColumnImportance": {
+      "type": "string",
+      "description": "Importance of the column",
+      "enum": [
+        "Required",
+        "Recommended",
+        "Optional"
+      ],
+      "example": "Required",
+      "default": "Optional"
+    },
+    "BeezUP.Common.ColumnDataType": {
+      "description": "Data type of the column, will be used for parsing and for consolidation proces",
+      "enum": [
+        "String",
+        "Url",
+        "Text",
+        "Decimal",
+        "DateTime",
+        "Int",
+        "SpecialInt",
+        "InStock",
+        "Unknown",
+        "ImageUrl"
+      ],
+      "type": "string",
+      "default": "String",
+      "example": "String"
+    },
+    "BeezUP.Common.BeezUPColumnName": {
+      "type": "string",
+      "description": "The BeezUP column name",
+      "example": "CategoryFirstLevel"
+    },
+    "BeezUP.Common.MarketplaceTechnicalCode": {
+      "description": "The technical code of the marketplace.",
+      "type": "string",
+      "example": "Amazon",
+      "x-lov": "OMMarketplaceTechnicalCode"
+    },
+    "BeezUP.Common.MarketplaceAccountId": {
+      "description": "The marketplace account identifier in BeezUP. This account identifier is based on your api settings.",
+      "type": "integer",
+      "format": "int32",
+      "example": 1234
+    },
+    "BeezUP.Common.MarketplaceBusinessCode": {
+      "description": "In an marketplace technical code like CDiscount you can have several marketplaces like GO SPORT, etc. We identify them by a business code.",
+      "type": "string",
+      "example": "GOSPORT",
+      "x-lov": "MarketplaceBusinessCode"
+    },
+    "BeezUP.Common.CountryIsoCodeAlpha3": {
+      "description": "The country iso code alpha 3 <a href=\"https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3\">(ISO 3166-1_alpha-3)</a>",
+      "type": "string",
+      "x-lov": "Country",
+      "example": "FRA"
+    },
+    "BeezUP.Common.CurrencyCode": {
+      "description": "The currency code <a href=\"https://en.wikipedia.org/wiki/ISO_4217\">(ISO 4217)</a>\n",
+      "type": "string",
+      "example": "EUR"
+    },
+    "BeezUP.Common.Email": {
+      "description": "The email",
+      "type": "string",
+      "format": "email",
+      "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+      "example": "paulsimon@mysupercompany.com"
+    },
+    "BeezUP.Common.UserId": {
+      "format": "guid",
+      "description": "The user identifier",
+      "type": "string",
+      "example": "8a7fbdec-9e71-472e-9974-27d5c1d57cf8"
+    },
+    "BeezUP.Common.StoreId": {
+      "format": "guid",
+      "description": "The store identifier",
+      "type": "string",
+      "example": "64f43358-63a1-47f7-97ec-0301fc39956b"
+    },
+    "BeezUP.Common.ChannelCatalogId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The channel catalog identifier",
+      "example": "6d6b04de-406b-4539-8e7e-bf3e8da5dfb0"
+    },
+    "BeezUP.Common.ChannelCategoryId": {
+      "type": "string",
+      "format": "guid",
+      "example": "24f508da-a069-4467-b9d3-15baebe9bac7"
+    },
+    "BeezUP.Common.ChannelCategoryPath": {
+      "description": "The channel category path",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "Clothing",
+        "Women",
+        "Shoes"
+      ]
+    },
+    "BeezUP.Common.CatalogCategoryPath": {
+      "description": "The catalog category path",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "VÃªtements",
+        "Femmes",
+        "Chaussures"
+      ]
+    },
+    "BeezUP.Common.CatalogCategoryId": {
+      "description": "The catalog category identifier",
+      "type": "string",
+      "format": "guid",
+      "example": "81a058a6-0451-4b79-84ef-94c58d0ed4ac"
+    },
+    "BeezUP.Common.ChannelId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The channel identifier",
+      "example": "2dc136a7-0d3d-4cc9-a825-a28a42c53e28"
+    },
+    "BeezUP.Common.ChannelName": {
+      "type": "string",
+      "description": "The channel name",
+      "example": "Amazon FRA"
+    },
+    "BeezUP.Common.ProductId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The product identifier",
+      "example": "578419df-1bbf-41a6-96fa-862e42182b67"
+    },
+    "BeezUP.Common.ChannelColumnId": {
+      "type": "string",
+      "format": "guid",
+      "description": "The channel column identifier",
+      "example": "8a76f06a-fefc-4c0d-bcfe-b210f1482977"
+    },
+    "BeezUP.Common.ListOfValueItem": {
+      "description": "This object is used by LOV apis",
+      "type": "object",
+      "required": [
+        "codeIdentifier",
+        "intIdentifier"
+      ],
+      "properties": {
+        "position": {
+          "format": "int32",
+          "type": "integer",
+          "example": 1
+        },
+        "codeIdentifier": {
+          "type": "string",
+          "example": "FRA"
+        },
+        "translationText": {
+          "type": "string",
+          "example": "France"
+        },
+        "intIdentifier": {
+          "format": "int32",
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "BeezUP.Common.PaginationResult": {
+      "type": "object",
+      "required": [
+        "entryCount",
+        "pageCount",
+        "totalEntryCount",
+        "links"
+      ],
+      "properties": {
+        "entryCount": {
+          "type": "integer",
+          "description": "The entry count currently returned",
+          "example": 25,
+          "minimum": 0
+        },
+        "pageCount": {
+          "type": "integer",
+          "description": "The page count",
+          "example": 38,
+          "minimum": 0
+        },
+        "totalEntryCount": {
+          "type": "integer",
+          "description": "The total entry count",
+          "example": 943,
+          "minimum": 0
+        },
+        "links": {
+          "$ref": "#/definitions/BeezUP.Common.PaginationResultLinks"
+        }
+      },
+      "example": {
+        "entryCount": 25,
+        "pageCount": 38,
+        "totalEntryCount": 943,
+        "links": {
+          "first": {
+            "href": "/v2/user/marketplaces/orders/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 1
+                }
+              }
+            ]
+          },
+          "last": {
+            "href": "/v2/user/marketplaces/orders/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 38
+                }
+              }
+            ]
+          },
+          "next": {
+            "href": "/v2/user/marketplaces/orders/list/full",
+            "method": "POST",
+            "parameters": [
+              {
+                "name": "request",
+                "in": "body",
+                "type": "object",
+                "schema": "orderListRequest",
+                "value": {
+                  "beginPeriodUtcDate": "2014-08-25T07:32:31.584Z",
+                  "endPeriodUtcDate": "2014-09-24T07:32:31.584Z",
+                  "pageSize": 25,
+                  "pageNumber": 2
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "BeezUP.Common.PaginationResultLinks": {
+      "description": "The navigation links 'first', 'last', 'next', 'previous'",
+      "type": "object",
+      "required": [
+        "first",
+        "last"
+      ],
+      "properties": {
+        "first": {
+          "$ref": "#/definitions/BeezUP.Common.Link3"
+        },
+        "last": {
+          "$ref": "#/definitions/BeezUP.Common.Link3"
+        },
+        "previous": {
+          "$ref": "#/definitions/BeezUP.Common.Link3"
+        },
+        "next": {
+          "$ref": "#/definitions/BeezUP.Common.Link3"
+        }
+      }
+    },
+    "BeezUP.Common.Href": {
+      "type": "string",
+      "example": "/v2/marketplaces/orders/{marketplaceTechnicalCode}/{accountId}/{beezUPOrderId}",
+      "description": "Indicate the relative uri for this link"
+    },
+    "BeezUP.Common.OperationId": {
+      "type": "string",
+      "description": "The operationId to call.",
+      "example": "GetOrder"
+    },
+    "BeezUP.Common.HttpMethod": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE",
+        "PUT",
+        "HEAD"
+      ],
+      "default": "GET",
+      "example": "GET",
+      "description": "Indicate the http method to use on this link"
+    },
+    "BeezUP.Common.Link3": {
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "docUrl": {
+          "$ref": "#/definitions/BeezUP.Common.DocUrl"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the link",
+          "example": "This is a description link"
+        },
+        "href": {
+          "$ref": "#/definitions/BeezUP.Common.Href"
+        },
+        "operationId": {
+          "$ref": "#/definitions/BeezUP.Common.OperationId"
+        },
+        "method": {
+          "$ref": "#/definitions/BeezUP.Common.HttpMethod"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BeezUP.Common.LinkParameter3"
+          }
+        },
+        "urlTemplated": {
+          "type": "boolean",
+          "description": "indicates whether the href is templated or not"
+        },
+        "allRequiredParamsProvided": {
+          "type": "boolean",
+          "description": "indicates whether all required params have been provided"
+        },
+        "allOptionalParamsProvided": {
+          "type": "boolean",
+          "description": "indicates whether all optionals params have been provided"
+        },
+        "info": {
+          "$ref": "#/definitions/BeezUP.Common.InfoSummaries"
+        }
+      }
+    },
+    "BeezUP.Common.Link2": {
+      "type": "object",
+      "x-deprecated": true,
+      "required": [
+        "rel"
+      ],
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "Indicate the relation name related to the link",
+          "example": "self"
+        },
+        "href": {
+          "$ref": "#/definitions/BeezUP.Common.Href"
+        },
+        "operationId": {
+          "$ref": "#/definitions/BeezUP.Common.OperationId"
+        },
+        "method": {
+          "$ref": "#/definitions/BeezUP.Common.HttpMethod"
+        },
+        "parameters": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 0,
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.LinkParameter2"
+          }
+        },
+        "info": {
+          "$ref": "#/definitions/BeezUP.Common.InfoSummaries"
+        }
+      }
+    },
+    "BeezUP.Common.ParameterIn": {
+      "type": "string",
+      "description": "* path: if the parameter must be pass in the path uri\n* header: if the parameter must be passed in http header\n* query: if the parameter must be passed in querystring\n* body: if the paramter must be passed in the body\n",
+      "example": "path",
+      "enum": [
+        "path",
+        "header",
+        "query",
+        "body"
+      ]
+    },
+    "BeezUP.Common.ParameterType": {
+      "description": "The value type of the parameter",
+      "type": "string",
+      "enum": [
+        "string",
+        "integer",
+        "number",
+        "boolean",
+        "object",
+        "array",
+        "date",
+        "date-time"
+      ],
+      "default": "string",
+      "example": "string"
+    },
+    "BeezUP.Common.LinkParameter3": {
+      "type": "object",
+      "required": [
+        "in"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link parameter. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "value": {
+          "type": "object",
+          "description": "The value of the parameter. It can be an integer a string or an object.",
+          "example": "1234"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "example": true
+        },
+        "in": {
+          "$ref": "#/definitions/BeezUP.Common.ParameterIn"
+        },
+        "type": {
+          "$ref": "#/definitions/BeezUP.Common.ParameterType"
+        },
+        "lovLink": {
+          "$ref": "#/definitions/BeezUP.Common.LOVLink3"
+        },
+        "lovRequired": {
+          "type": "boolean",
+          "description": "If true, you MUST indicate a value from the list of values otherwise it's a freetext",
+          "example": true
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the parameter",
+          "example": "the store identifier"
+        },
+        "schema": {
+          "type": "string",
+          "description": "schema of the parameter",
+          "example": "orderListRequest"
+        },
+        "properties": {
+          "description": "If the parameter is an object with flexible properties (additionProperties/dictionary), we will describe the properties of the object.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/BeezUP.Common.LinkParameterProperty3"
+          },
+          "example": {
+            "shipOrder": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "BeezUP.Common.LinkParameterProperty3": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label corresponding to the link parameter property. This label is automatically translated based on the Accept-Language http header.",
+          "example": "The translated label"
+        },
+        "value": {
+          "type": "object",
+          "description": "The value of the parameter. It can be an integer a string or an object.",
+          "example": "1234"
+        },
+        "required": {
+          "type": "boolean",
+          "example": true
+        },
+        "type": {
+          "$ref": "#/definitions/BeezUP.Common.ParameterType"
+        },
+        "lovLink": {
+          "$ref": "#/definitions/BeezUP.Common.LOVLink3"
+        },
+        "lovRequired": {
+          "type": "boolean",
+          "description": "If true, you MUST use indicate a value from the list of values otherwise it's a freetext",
+          "example": true
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the parameter",
+          "example": "the store identifier"
+        },
+        "schema": {
+          "type": "string",
+          "description": "schema of the parameter",
+          "example": "orderListRequest"
+        }
+      }
+    },
+    "BeezUP.Common.LinkParameter2": {
+      "type": "object",
+      "x-deprecated": true,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the parameter",
+          "example": "marketplaceTechnicalCode"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the parameter",
+          "example": "1234"
+        },
+        "required": {
+          "type": "boolean",
+          "example": true
+        },
+        "in": {
+          "$ref": "#/definitions/BeezUP.Common.ParameterIn"
+        },
+        "type": {
+          "$ref": "#/definitions/BeezUP.Common.ParameterType"
+        },
+        "lovLink": {
+          "description": "This parameter expect the values indicated in this list of values.",
+          "$ref": "#/definitions/BeezUP.Common.LOVLink2"
+        },
+        "lovRequired": {
+          "type": "boolean",
+          "description": "If true, you MUST use indicate a value from the list of values otherwise it's a freetext",
+          "example": true
+        }
+      }
+    },
+    "BeezUP.Common.LOVLink2": {
+      "description": "Describe the way you have to follow to get access to the LOV",
+      "x-deprecated": true,
+      "type": "object",
+      "required": [
+        "listName"
+      ],
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "Indicate the relation name related to the link",
+          "example": "LOV_Go2CultureName"
+        },
+        "href": {
+          "type": "string",
+          "default": "/v2/user/{listName}",
+          "example": "/v2/public/{listName}",
+          "description": "Indicate the relative uri pattern to the list of value"
+        },
+        "listName": {
+          "type": "string",
+          "description": "The name of the list of value",
+          "example": "Go2CultureName"
+        }
+      }
+    },
+    "BeezUP.Common.LOVLink3": {
+      "description": "Describe the way you have to follow to get access to the LOV",
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "format": "uri",
+          "example": "/v2/public/Go2CultureName",
+          "description": "Indicate the uri to the list of value"
+        },
+        "method": {
+          "$ref": "#/definitions/BeezUP.Common.HttpMethod"
+        }
+      }
+    },
+    "BeezUP.Common.HttpUrl": {
+      "description": "The URL <a href=\"https://en.wikipedia.org/wiki/URL\">https://en.wikipedia.org/wiki/URL</a>",
+      "type": "string",
+      "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "example": "http://www.mydomain.com"
+    },
+    "BeezUP.Common.ErrorResponseMessage": {
+      "type": "object",
+      "required": [
+        "errors"
+      ],
+      "properties": {
+        "errors": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.UserErrorMessage"
+          }
+        }
+      }
+    },
+    "BeezUP.Common.DocUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The documentation related to this operation.",
+      "example": "https://api-docs.beezup.com/#operation/EnableChannelCatalog"
+    },
+    "BeezUP.Common.UserErrorMessage": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "docUrl": {
+          "$ref": "#/definitions/BeezUP.Common.DocUrl"
+        },
+        "code": {
+          "type": "string",
+          "description": "the error code. The error code can be a pattern containing the argument's name",
+          "example": "CatalogImportationAlreadyInProgress(ExecutionId currentCatalogImportationId)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The error message",
+          "example": "There is already an importation in progress: b24d0dd8-a561-478a-9b26-34f573f03527\n"
+        },
+        "cultureName": {
+          "type": "string",
+          "description": "If the error is translated, the culture name will be indicated",
+          "example": "en",
+          "x-lov": "Go2CultureName"
+        },
+        "arguments": {
+          "type": "array",
+          "description": "a dictionary string/object",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The key of the parameter",
+                "example": "currentCatalogImportationId"
+              },
+              "value": {
+                "type": "object",
+                "description": "The value of the parameter. Depending to the type.",
+                "example": "b24d0dd8-a561-478a-9b26-34f573f03527"
+              }
+            }
+          }
+        }
+      }
+    },
+    "BeezUP.Common.InfoSummaries": {
+      "type": "object",
+      "properties": {
+        "successes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.SuccessSummary"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.ErrorSummary"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.WarningSummary"
+          }
+        },
+        "informations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.InfoSummary"
+          }
+        }
+      }
+    },
+    "BeezUP.Common.SuccessSummary": {
+      "type": "object",
+      "properties": {
+        "successCode": {
+          "type": "string"
+        },
+        "successMessage": {
+          "type": "string"
+        },
+        "successArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        }
+      }
+    },
+    "BeezUP.Common.ErrorSummary": {
+      "type": "object",
+      "properties": {
+        "utcDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "errorGuid": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "technicalErrorMessage": {
+          "type": "string"
+        },
+        "exceptionDetail": {
+          "$ref": "#/definitions/BeezUP.Common.ExceptionDetail"
+        },
+        "errorArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "BeezUP.Common.WarningSummary": {
+      "type": "object",
+      "properties": {
+        "technicalErrorMessage": {
+          "type": "string"
+        },
+        "warningMessage": {
+          "type": "string"
+        },
+        "warningCode": {
+          "type": "string"
+        },
+        "warningArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "BeezUP.Common.InfoSummary": {
+      "type": "object",
+      "properties": {
+        "informationCode": {
+          "type": "string"
+        },
+        "informationMessage": {
+          "type": "string"
+        },
+        "informationArguments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "propertyName": {
+          "type": "string"
+        },
+        "propertyValue": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        }
+      }
+    },
+    "BeezUP.Common.ExceptionDetail": {
+      "type": "object",
+      "properties": {
+        "helpLink": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "BeezUP.Common.ApiSettingsStatus": {
+      "type": "string",
+      "enum": [
+        "warning",
+        "success",
+        "failed"
+      ],
+      "example": "success"
+    },
+    "BeezUP.Common.ApiCredentials": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "description": "Your API credential list",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BeezUP.Common.ApiCredential"
+          },
+          "example": [
+            {
+              "productName": "UserApi",
+              "primaryToken": "3b22980d8d1143c6ba7adf4e55b9a153",
+              "secondaryToken": "162ae17fd52044c38cce3388ea5b0c91"
+            }
+          ]
+        }
+      }
+    },
+    "BeezUP.Common.ApiCredential": {
+      "description": "Your api credential",
+      "type": "object",
+      "properties": {
+        "productName": {
+          "description": "The product name related to this credential",
+          "type": "string",
+          "example": "UserAPI"
+        },
+        "primaryToken": {
+          "description": "The primary token to be used in the next call in the user scope API",
+          "type": "string",
+          "example": "3b22980d8d1143c6ba7adf4e55b9a153"
+        },
+        "secondaryToken": {
+          "description": "The secondary token. Could be usefull if you want to share your access with someone else.",
+          "type": "string",
+          "example": "162ae17fd52044c38cce3388ea5b0c91"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find the documentation for BeezUP's API here",
+    "url": "https://api-docs.beezup.com/"
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Ocp-Apim-Subscription-Key"
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Marketplace Gateway API - Feeds",
+      "tags": [
+        "Marketplace Gateway API - Feeds - Publication"
+      ]
+    },
+    {
+      "name": "Marketplace Gateway API - Orders",
+      "tags": [
+        "Marketplace Gateway API - Orders - Order Management"
+      ]
+    }
+  ],
+  "responses": {
+    "GeneralError": {
+      "description": "Occurs when something goes wrong",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "304_NotModified": {
+      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
+      "headers": {
+        "Last-Modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
+        },
+        "ETag": {
+          "type": "string",
+          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "412_PreConditionFailed": {
+      "description": "The ETag sent in the http header If-Match did not match with the current version. Please refresh the information related to this resource.",
+      "headers": {
+        "ETag": {
+          "type": "string",
+          "description": "The ETag value to identify the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "merchantNotFound": {
+      "description": "The merchant code is not found.",
+      "x-exceptions": [
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "marketplaceNotFound": {
+      "description": "The marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMarketplaceCredential": {
+      "description": "The marketplace credential is invalid",
+      "x-exceptions": [
+        "InvalidMarketplaceCredentialException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantOrMarketplaceNotFound": {
+      "description": "The merchant code or marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException",
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantCodeAlreadyUsed": {
+      "description": "The merchant code is not available",
+      "x-exceptions": [
+        "MerchantCodeAlreadyUsedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMerchantCode": {
+      "description": "The merchant code is different from the state",
+      "x-exceptions": [
+        "InvalidMerchantCodeException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "notOfferSourceMarketplace": {
+      "description": "The marketplace is not the offer source",
+      "x-exceptions": [
+        "NotOfferSourceMarketplaceException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "subscriptionNotAccepted": {
+      "description": "The subscription is not accepted by the marketplace",
+      "x-exceptions": [
+        "SubscriptionNotAcceptedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    },
+    "credentialNotConfigured": {
+      "description": "The credential is not configured for the marketplace",
+      "x-exceptions": [
+        "CredentialNotConfiguredException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    }
+  }
+}
