@@ -373,15 +373,16 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "name": "Accept-Encoding",
-            "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size",
+            "name": "Content-Encoding",
+            "description": "The content of the body is compressed to reduce traffic",
             "in": "header",
             "required": true,
             "type": "string",
             "collectionFormat": "csv",
             "items": {
               "type": "string"
-            }
+            },
+            "x-example": "gzip"
           },
           {
             "name": "request",
@@ -468,11 +469,34 @@
           },
           {
             "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "BeezUP will indicates the expected content encoding.",
+            "required": true,
+            "type": "string",
+            "collectionFormat": "csv",
+            "items": {
+              "type": "string"
+            },
+            "x-example": "gzip"
           }
         ],
         "responses": {
           "200": {
             "description": "The error reporting is retrieved",
+            "headers": {
+              "Content-Encoding": {
+                "description": "The response is zipped to reduce traffic.",
+                "type": "string",
+                "collectionFormat": "csv",
+                "items": {
+                  "type": "string"
+                },
+                "x-example": "gzip"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/getFeedPublicationReportingResponse"
             }
@@ -574,6 +598,18 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "description": "BeezUP will indicates the expected content encoding.",
+            "required": true,
+            "type": "string",
+            "collectionFormat": "csv",
+            "items": {
+              "type": "string"
+            },
+            "x-example": "gzip"
+          },
+          {
             "name": "pageNumber",
             "description": "The page number of the order list",
             "in": "query",
@@ -614,6 +650,17 @@
         "responses": {
           "200": {
             "description": "The order list is retrieved",
+            "headers": {
+              "Content-Encoding": {
+                "description": "The response is zipped to reduce traffic.",
+                "type": "string",
+                "collectionFormat": "csv",
+                "items": {
+                  "type": "string"
+                },
+                "x-example": "gzip"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/marketplaceOrderList"
             }
