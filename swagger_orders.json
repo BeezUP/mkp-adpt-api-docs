@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "BeezUP gateway API",
-    "description": "\r\n# The REST API of BeezUP system - Adapter\r\n## Overview\r\nThe REST APIs provide programmatic access to read and write BeezUP data. \r\n\r\nThis API have to be implemented by the marketplaces to be able to receive/send data from BeezUP.\r\n\r\n\r\nThe main features are:\r\n- Receive merchant feeds (products and offers)\r\n- Fetch merchant orders\r\n- Receive merchant order changes\r\n- ...\r\n\r\n\r\n## Things to keep in mind\r\n### Media type\r\nThe default media type for requests and responses is application/json. Where noted, some operations support other content types. If no additional content type is mentioned for a specific operation, then the media type is application/json.\r\n\r\n### Required content type\r\nThe required and default encoding for the request and responses is UTF8.\r\n\r\n### Required date time format\r\nAll our date time are formatted in ISO 8601 format: 2014-06-24T16:25:00Z.\r\n\r\n### Base URL\r\nAll URLs returned by the BeezUP API are relative to this base URL, and all requests to the REST API must use this base URL template.\r\n\r\nYou can test our API on https://beezup.github.io/mkp-adpt-api-docs/swagger-ui\\\\\r\nYou can contact us on [gitter, #BeezUP/API](https://gitter.im/BeezUP/API)\r\n\r\n",
+    "title": "BeezUP gateway-orders API",
+    "description": "\r\n# The REST API of BeezUP system - Adapter for Order Management\r\n## Overview\r\nThe REST APIs provide programmatic access to read and write BeezUP data. \r\n\r\nThis API have to be implemented by the marketplaces to be able to receive/send data from BeezUP.\r\n\r\n\r\nThe main features are:\r\n- Fetch merchant orders\r\n- Receive merchant order changes\r\n- ...\r\n\r\n\r\n## Things to keep in mind\r\n### Media type\r\nThe default media type for requests and responses is application/json. Where noted, some operations support other content types. If no additional content type is mentioned for a specific operation, then the media type is application/json.\r\n\r\n### Required content type\r\nThe required and default encoding for the request and responses is UTF8.\r\n\r\n### Required date time format\r\nAll our date time are formatted in ISO 8601 format: 2014-06-24T16:25:00Z.\r\n\r\n### Base URL\r\nAll URLs returned by the BeezUP API are relative to this base URL, and all requests to the REST API must use this base URL template.\r\n\r\nYou can test our API on https://beezup.github.io/mkp-adpt-api-docs/swagger-ui\\\\\r\nYou can contact us on [gitter, #BeezUP/API](https://gitter.im/BeezUP/API)\r\n\r\nFeed Management only for code generation: https://beezup.github.io/mkp-adpt-api-docs/swagger_feeds.json\r\nOrder Management only for code generation: https://beezup.github.io/mkp-adpt-api-docs/swagger_orders.json\r\n\r\n",
     "version": "2.0",
     "x-logo": {
       "url": "https://avatars0.githubusercontent.com/u/25665430",
@@ -22,23 +22,22 @@
     "repo": "BeezUP",
     "product": "BeezUP",
     "group": "adpt-feedpub",
-    "applicationShortName": "MKP.ADPT.Feeds.WS",
-    "appRoot": "BZ.MKP.ADPT.Feeds.WebService",
-    "namespace": "BZ.MKP.ADPT.Feeds.WebService",
-    "apiName": "MkpGatewayOffersV1",
+    "applicationShortName": "MKP.ADPT.Orders.WS",
+    "appRoot": "BZ.MKP.ADPT.Orders.WebService",
+    "namespace": "BZ.MKP.ADPT.Orders.WebService",
+    "apiName": "MkpGatewayOrdersV1",
     "useBeezUPFrameworkVersion2": true,
     "comment": "First document\n",
     "using": [
       "BeezUP2.Framework.Messaging",
       "BeezUP2.Framework.Business",
-      "BeezUP2.MKP.Feeds.Schemas",
-      "BeezUP2.MKP.Feeds.Messages"
+      "BeezUP2.MKP.Orders.Schemas"
     ],
     "packages": [
       "BeezUPWebApi"
     ]
   },
-  "x-basePath": "/marketplace/feeds/v1",
+  "x-basePath": "/marketplace/orders/v1",
   "schemes": [
     "https"
   ],
@@ -49,10 +48,6 @@
     "application/json"
   ],
   "tags": [
-    {
-      "name": "Marketplace Gateway API - Feeds - Publication",
-      "x-displayName": "Publication"
-    },
     {
       "name": "Marketplace Gateway API - Orders - Order Management",
       "x-displayName": "Order Management"
@@ -71,8 +66,8 @@
       "required": true,
       "type": "integer"
     },
-    "publicationIdParameter": {
-      "name": "publicationId",
+    "executionIdParameter": {
+      "name": "executionId",
       "in": "path",
       "required": true,
       "type": "string",
@@ -84,13 +79,6 @@
       "required": true,
       "type": "string",
       "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
-    },
-    "executionIdParameter": {
-      "name": "executionId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "guid"
     },
     "marketplaceOrderIdParameter": {
       "name": "marketplaceOrderId",
@@ -234,326 +222,6 @@
     }
   },
   "paths": {
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/health": {
-      "post": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "summary": "Ping the status of your feed system",
-        "operationId": "PingGatewayFeedApi",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The status of the API is up!",
-            "schema": {
-              "$ref": "#/definitions/healthCheck"
-            }
-          },
-          "503": {
-            "description": "The status of your API is down..."
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/start": {
-      "post": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "summary": "Start the feed publication",
-        "operationId": "StartFeedPublication",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/startFeedPublicationRequest"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The feed publication has been started!"
-          },
-          "400": {
-            "$ref": "#/responses/GeneralError"
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode and AccountId is invalid"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/complete": {
-      "post": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "summary": "Complete the feed publication",
-        "operationId": "CompleteFeedPublication",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/completeFeedPublicationRequest"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The feed comands has been completed!"
-          },
-          "400": {
-            "$ref": "#/responses/GeneralError"
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/messages": {
-      "post": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "summary": "Push a batch of feed messages",
-        "operationId": "PushMerchantFeedMessages",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "name": "Content-Encoding",
-            "description": "The content of the body is compressed to reduce traffic",
-            "in": "header",
-            "required": true,
-            "type": "string",
-            "collectionFormat": "csv",
-            "items": {
-              "type": "string"
-            },
-            "x-example": "gzip"
-          },
-          {
-            "name": "request",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/pushFeedMessagesRequest"
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "The feed messages have been registered!"
-          },
-          "400": {
-            "$ref": "#/responses/GeneralError"
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/status": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "x-tagGroups": "Publication",
-        "operationId": "CheckPublicationStatus",
-        "summary": "Check the publication status",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Publication status retrieved",
-            "schema": {
-              "$ref": "#/definitions/checkFeedPublicationStatusResponse"
-            }
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
-          },
-          "409": {
-            "description": "Publication status not yet available"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/reporting": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "x-tagGroups": "Publication",
-        "operationId": "GetPublicationReporting",
-        "summary": "Get the publication reporting",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "name": "Accept-Encoding",
-            "in": "header",
-            "description": "BeezUP will indicates the expected content encoding.",
-            "required": true,
-            "type": "string",
-            "collectionFormat": "csv",
-            "items": {
-              "type": "string"
-            },
-            "x-example": "gzip"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The error reporting is retrieved",
-            "headers": {
-              "Content-Encoding": {
-                "description": "The response is zipped to reduce traffic.",
-                "type": "string",
-                "collectionFormat": "csv",
-                "items": {
-                  "type": "string"
-                },
-                "x-example": "gzip"
-              }
-            },
-            "schema": {
-              "$ref": "#/definitions/getFeedPublicationReportingResponse"
-            }
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
-          },
-          "409": {
-            "description": "Reporting not yet available"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/exchangedMessages": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "x-tagGroups": "Publication",
-        "operationId": "GetPublicationExchangedMessages",
-        "summary": "Get the publication exchanged messages with the marketplace",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The exchanged messages are retrieved",
-            "schema": {
-              "$ref": "#/definitions/getFeedPublicationExchangedMessagesResponse"
-            }
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
-          },
-          "409": {
-            "description": "Reporting not yet available"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
     "/marketplace/orders/v1/{marketplaceBusinessCode}/ping": {
       "post": {
         "tags": [
@@ -3394,12 +3062,6 @@
     }
   },
   "x-tagGroups": [
-    {
-      "name": "Marketplace Gateway API - Feeds",
-      "tags": [
-        "Marketplace Gateway API - Feeds - Publication"
-      ]
-    },
     {
       "name": "Marketplace Gateway API - Orders",
       "tags": [
