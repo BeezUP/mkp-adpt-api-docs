@@ -55,31 +55,12 @@
     }
   ],
   "parameters": {
-    "marketplaceBusinessCodeParameter": {
-      "name": "marketplaceBusinessCode",
-      "in": "path",
-      "required": true,
-      "type": "string"
-    },
-    "accountIdParameter": {
-      "name": "accountId",
-      "in": "path",
-      "required": true,
-      "type": "integer"
-    },
     "publicationIdParameter": {
       "name": "publicationId",
       "in": "path",
       "required": true,
       "type": "string",
       "format": "guid"
-    },
-    "credentialParameter": {
-      "name": "x-BeezUP-Credential",
-      "in": "header",
-      "required": true,
-      "type": "string",
-      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
     },
     "correlationIdParameter": {
       "name": "correlationId",
@@ -257,10 +238,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "name": "request",
@@ -302,10 +283,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "name": "request",
@@ -347,10 +328,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "name": "Content-Encoding",
@@ -404,10 +385,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           }
         ],
         "responses": {
@@ -445,10 +426,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "name": "Accept-Encoding",
@@ -509,10 +490,10 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/publicationIdParameter"
+            "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
+            "$ref": "#/parameters/publicationIdParameter"
           }
         ],
         "responses": {
