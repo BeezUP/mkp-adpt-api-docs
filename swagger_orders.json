@@ -412,267 +412,141 @@
         "failed"
       ]
     },
-    "startFeedPublicationRequest": {
+    "getOrderListResponse": {
       "type": "object",
       "required": [
-        "feedType"
+        "hasNextPage",
+        "orders"
       ],
       "properties": {
-        "feedType": {
-          "$ref": "#/definitions/feedMessageType"
-        }
-      }
-    },
-    "completeFeedPublicationRequest": {
-      "type": "object",
-      "required": [
-        "processingStatus"
-      ],
-      "properties": {
-        "processingStatus": {
-          "$ref": "#/definitions/processingStatus"
+        "hasNextPage": {
+          "type": "boolean",
+          "description": "Indicates to the client that there is another page to fetch"
         },
-        "errorMessage": {
-          "type": "string"
-        },
-        "errorId": {
-          "type": "string"
-        }
-      }
-    },
-    "pushFeedMessagesRequest": {
-      "type": "object",
-      "properties": {
-        "messages": {
+        "orders": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/feedMessage"
+            "$ref": "#/definitions/marketplaceOrder"
           }
         }
       }
     },
-    "checkFeedPublicationStatusResponse": {
-      "description": "Publication Status Response",
+    "getOrderResponse": {
+      "$ref": "#/definitions/marketplaceOrder"
+    },
+    "pushOrderChangeMessageRequest": {
       "type": "object",
       "required": [
-        "status"
+        "beezUPOrderChangeType",
+        "marketplaceOrderItems"
       ],
       "properties": {
-        "status": {
-          "$ref": "#/definitions/feedPublicationStatus"
+        "beezUPOrderChangeType": {
+          "$ref": "#/definitions/beezUPOrderChangeType"
         },
-        "globalReportings": {
+        "parameters": {
+          "$ref": "#/definitions/orderChangeParameters"
+        },
+        "marketplaceOrderItems": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/reportingItem"
+            "$ref": "#/definitions/marketplaceOrderItem"
           }
         }
       }
     },
-    "getFeedPublicationReportingResponse": {
-      "description": "Publication Reporting Response",
+    "marketplaceOrder": {
       "type": "object",
+      "required": [
+        "marketplaceOrderId",
+        "orderPurchaseUtcDate",
+        "marketplaceOrderStatus",
+        "marketplaceOrderLastModificationUtcDate",
+        "marketplaceOrderETag",
+        "properties",
+        "items"
+      ],
       "properties": {
-        "feedReportings": {
+        "marketplaceOrderId": {
+          "$ref": "#/definitions/marketplaceOrderId"
+        },
+        "orderPurchaseUtcDate": {
+          "$ref": "#/definitions/orderPurchaseUtcDate"
+        },
+        "marketplaceOrderStatus": {
+          "$ref": "#/definitions/marketplaceOrderStatus"
+        },
+        "marketplaceOrderLastModificationUtcDate": {
+          "$ref": "#/definitions/marketplaceOrderLastModificationUtcDate"
+        },
+        "marketplaceOrderETag": {
+          "$ref": "#/definitions/marketplaceOrderETag"
+        },
+        "properties": {
+          "$ref": "#/definitions/marketplaceOrderProperties"
+        },
+        "items": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/feedReporting"
+            "$ref": "#/definitions/marketplaceOrderItem"
           }
         }
       }
     },
-    "getFeedPublicationExchangedMessagesResponse": {
-      "description": "Publication Exchanged Messages Response",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/publicationExchangedMessage"
-      }
+    "marketplaceOrderId": {
+      "description": "The marketplace order identifier",
+      "type": "string"
     },
-    "feedType": {
+    "orderPurchaseUtcDate": {
       "type": "string",
-      "enum": [
-        "products",
-        "offers"
-      ]
+      "format": "date-time"
     },
-    "feedMessageType": {
+    "marketplaceOrderStatus": {
+      "type": "string"
+    },
+    "marketplaceOrderLastModificationUtcDate": {
       "type": "string",
-      "enum": [
-        "publish",
-        "unpublish"
-      ]
+      "format": "date-time"
     },
-    "reportingType": {
-      "type": "string",
-      "enum": [
-        "error",
-        "warning"
-      ],
-      "default": "error"
+    "marketplaceOrderETag": {
+      "type": "string"
     },
-    "feedPublicationStatus": {
-      "type": "string",
-      "enum": [
-        "notStarted",
-        "inProgress",
-        "success",
-        "failed"
-      ],
-      "default": "notStarted"
-    },
-    "operationName": {
-      "type": "string",
-      "enum": [
-        "pingGatewayFeedApi",
-        "startFeedPublication",
-        "completeFeedPublication",
-        "pushMerchantFeedMessages",
-        "checkPublicationStatus",
-        "getPublicationReporting",
-        "getPublicationExchangedMessages"
-      ],
-      "default": "pushMerchantFeedMessages"
-    },
-    "feedMessage": {
+    "marketplaceOrderProperties": {
       "type": "object",
-      "discriminator": "messageType",
-      "properties": {
-        "sku": {
-          "$ref": "#/definitions/sku"
-        },
-        "messageType": {
-          "$ref": "#/definitions/feedMessageType"
-        }
+      "additionalProperties": {
+        "type": "string"
       }
     },
-    "feedMetadata": {
+    "marketplaceOrderItem": {
       "type": "object",
       "required": [
-        "key",
-        "value"
+        "properties"
       ],
       "properties": {
-        "key": {
-          "type": "string",
-          "description": "The marketplace column name"
+        "marketplaceOrderItemId": {
+          "$ref": "#/definitions/marketplaceOrderItemId"
         },
-        "value": {
-          "type": "string"
+        "properties": {
+          "$ref": "#/definitions/marketplaceOrderItemProperties"
         }
       }
     },
-    "publishFeed": {
-      "x-exclude": true,
-      "allOf": [
-        {
-          "$ref": "#/definitions/feedMessage"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "metadata": {
-              "description": "where key is the marketplace column name",
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/feedMetadata"
-              }
-            }
-          }
-        }
-      ]
+    "marketplaceOrderItemId": {
+      "type": "string"
     },
-    "unpublishFeed": {
-      "x-exclude": true,
-      "allOf": [
-        {
-          "$ref": "#/definitions/feedMessage"
-        }
-      ]
-    },
-    "reportingItem": {
+    "marketplaceOrderItemProperties": {
       "type": "object",
-      "required": [
-        "reportingType",
-        "code",
-        "message"
-      ],
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/reportingType"
-        },
-        "code": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
+      "additionalProperties": {
+        "type": "string"
       }
     },
-    "feedReporting": {
-      "type": "object",
-      "required": [
-        "sku",
-        "reportings"
-      ],
-      "properties": {
-        "sku": {
-          "$ref": "#/definitions/sku"
-        },
-        "reportings": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/reportingItem"
-          }
-        }
-      }
+    "beezUPOrderChangeType": {
+      "type": "string"
     },
-    "publicationExchangedMessagesItem": {
+    "orderChangeParameters": {
       "type": "object",
-      "required": [
-        "marketplaceOperationName",
-        "requestUri",
-        "responseUri",
-        "requestUtcDate",
-        "responseUtcDate"
-      ],
-      "properties": {
-        "marketplaceOperationName": {
-          "type": "string"
-        },
-        "requestUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "responseUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "requestUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "responseUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "publicationExchangedMessage": {
-      "type": "object",
-      "required": [
-        "operationName"
-      ],
-      "properties": {
-        "operationName": {
-          "$ref": "#/definitions/operationName"
-        },
-        "exchangedMessages": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/publicationExchangedMessagesItem"
-          }
-        }
+      "additionalProperties": {
+        "type": "string"
       }
     },
     "deliveryMethod": {
@@ -2784,6 +2658,41 @@
     }
   ],
   "parameters": {
+    "executionIdParameter": {
+      "name": "executionId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "guid"
+    },
+    "marketplaceOrderIdParameter": {
+      "name": "marketplaceOrderId",
+      "description": "The marketplace order identifier",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MarketplaceOrderId",
+      "x-example": "M1234X10"
+    },
+    "marketplaceBusinessCodeParameter": {
+      "name": "marketplaceBusinessCode",
+      "in": "path",
+      "required": true,
+      "type": "string"
+    },
+    "accountIdParameter": {
+      "name": "accountId",
+      "in": "path",
+      "required": true,
+      "type": "integer"
+    },
+    "credentialParameter": {
+      "name": "x-BeezUP-Credential",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
+    },
     "correlationIdParameter": {
       "name": "correlationId",
       "in": "path",

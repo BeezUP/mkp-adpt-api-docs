@@ -62,6 +62,25 @@
       "type": "string",
       "format": "guid"
     },
+    "marketplaceBusinessCodeParameter": {
+      "name": "marketplaceBusinessCode",
+      "in": "path",
+      "required": true,
+      "type": "string"
+    },
+    "accountIdParameter": {
+      "name": "accountId",
+      "in": "path",
+      "required": true,
+      "type": "integer"
+    },
+    "credentialParameter": {
+      "name": "x-BeezUP-Credential",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
+    },
     "correlationIdParameter": {
       "name": "correlationId",
       "in": "path",
