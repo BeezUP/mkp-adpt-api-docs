@@ -1298,6 +1298,19 @@
         }
       }
     },
+    "marketplaceOrderChangeStatus": {
+      "type": "string"
+    },
+    "beezUPOrderChangeStatus": {
+      "type": "string",
+      "enum": [
+        "notStarted",
+        "inProgress",
+        "success",
+        "failed"
+      ],
+      "default": "notStarted"
+    },
     "startFeedPublicationRequest": {
       "type": "object",
       "required": [

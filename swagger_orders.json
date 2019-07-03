@@ -717,6 +717,19 @@
         }
       }
     },
+    "marketplaceOrderChangeStatus": {
+      "type": "string"
+    },
+    "beezUPOrderChangeStatus": {
+      "type": "string",
+      "enum": [
+        "notStarted",
+        "inProgress",
+        "success",
+        "failed"
+      ],
+      "default": "notStarted"
+    },
     "deliveryMethod": {
       "type": "string",
       "description": "A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer. Delivery methods are characterized by the means of transportation used, and by the organization or group that is the contracting party for the sending organization or person."
