@@ -90,6 +90,15 @@
         "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
       }
     },
+    "200_HealthCheck": {
+      "description": "The health check of the API",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/healthCheck"
+        }
+      }
+    },
     "GeneralError": {
       "description": "Occurs when something goes wrong",
       "schema": {
@@ -208,7 +217,7 @@
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
         ],
-        "summary": "Ping the status of your order management system",
+        "summary": "Health check the order management system",
         "operationId": "HealthCheckGatewayOrderApi",
         "parameters": [
           {
@@ -217,10 +226,10 @@
         ],
         "responses": {
           "200": {
-            "description": "The status of the API is up!",
-            "schema": {
-              "$ref": "#/definitions/healthCheck"
-            }
+            "$ref": "#/responses/200_HealthCheck"
+          },
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
           },
           "503": {
             "description": "The status of your API is down..."

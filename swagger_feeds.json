@@ -103,6 +103,15 @@
         "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
       }
     },
+    "200_HealthCheck": {
+      "description": "The health check of the API",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/healthCheck"
+        }
+      }
+    },
     "GeneralError": {
       "description": "Occurs when something goes wrong",
       "schema": {
@@ -400,13 +409,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The health check of the API",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/healthCheck"
-              }
-            }
+            "$ref": "#/responses/200_HealthCheck"
           },
           "400": {
             "$ref": "#/responses/400_MBC_Invalid"
