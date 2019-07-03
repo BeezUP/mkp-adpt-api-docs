@@ -53,6 +53,155 @@
       "x-displayName": "Order Management"
     }
   ],
+  "responses": {
+    "404_OrderChangeId_Not_Found": {
+      "description": "Order change not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "404_Order_Not_Found": {
+      "description": "Order not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "503_Marketplace_Down": {
+      "description": "The marketplace has an invalid response",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "400_MBC_Or_Request_Invalid": {
+      "description": "The marketplace business code is invalid or the request is invalid",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "409_Not_Yet_Available": {
+      "description": "Resource not yet available",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "404_BeezUP_TraceId_NotFound": {
+      "description": "BeezUP Trace Id is not found",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "GeneralError": {
+      "description": "Occurs when something goes wrong",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "304_NotModified": {
+      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
+      "headers": {
+        "Last-Modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
+        },
+        "ETag": {
+          "type": "string",
+          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "412_PreConditionFailed": {
+      "description": "The ETag sent in the http header If-Match did not match with the current version. Please refresh the information related to this resource.",
+      "headers": {
+        "ETag": {
+          "type": "string",
+          "description": "The ETag value to identify the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "merchantNotFound": {
+      "description": "The merchant code is not found.",
+      "x-exceptions": [
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "marketplaceNotFound": {
+      "description": "The marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMarketplaceCredential": {
+      "description": "The marketplace credential is invalid",
+      "x-exceptions": [
+        "InvalidMarketplaceCredentialException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantOrMarketplaceNotFound": {
+      "description": "The merchant code or marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException",
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantCodeAlreadyUsed": {
+      "description": "The merchant code is not available",
+      "x-exceptions": [
+        "MerchantCodeAlreadyUsedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMerchantCode": {
+      "description": "The merchant code is different from the state",
+      "x-exceptions": [
+        "InvalidMerchantCodeException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "notOfferSourceMarketplace": {
+      "description": "The marketplace is not the offer source",
+      "x-exceptions": [
+        "NotOfferSourceMarketplaceException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "subscriptionNotAccepted": {
+      "description": "The subscription is not accepted by the marketplace",
+      "x-exceptions": [
+        "SubscriptionNotAcceptedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    },
+    "credentialNotConfigured": {
+      "description": "The credential is not configured for the marketplace",
+      "x-exceptions": [
+        "CredentialNotConfiguredException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    }
+  },
   "paths": {
     "/marketplace/orders/v1/{marketplaceBusinessCode}/health": {
       "post": {
@@ -60,7 +209,7 @@
           "Marketplace Gateway API - Orders - Order Management"
         ],
         "summary": "Ping the status of your order management system",
-        "operationId": "PingGatewayOrderApi",
+        "operationId": "HealthCheckGatewayOrderApi",
         "parameters": [
           {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
@@ -127,7 +276,7 @@
           },
           {
             "name": "orderMarketplaceModificationBeginUtcDate",
-            "description": "The marketplace modification begin utc date already received by BeezUP. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
+            "description": "The marketplace modification begin utc date already received by BeezUP. \nBeezUP expects that all orders modification date are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
             "required": true,
             "in": "query",
             "type": "string",
@@ -136,7 +285,7 @@
           },
           {
             "name": "orderMarketplaceModificationEndUtcDate",
-            "description": "The marketplace modification end utc date. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
+            "description": "The marketplace modification end utc date. \nBeezUP expects that all orders modification date are older than this date.\nRECOMMANDATION: If the marketplace allows the filter with modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
             "in": "query",
             "required": true,
             "type": "string",
@@ -145,7 +294,7 @@
           },
           {
             "name": "orderPurchaseBeginUtcDate",
-            "description": "The order purchase begin UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
+            "description": "The order purchase begin UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with modification date than use the modification date filter instead the purchase date filter.\n",
             "in": "query",
             "required": true,
             "type": "string",
@@ -154,7 +303,7 @@
           },
           {
             "name": "orderLastPurchaseEndUtcDate",
-            "description": "The order purchase end UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
+            "description": "The order purchase end UTC date already received by BeezUP.\nBeezUP expects that all orders are older than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with modification date than use the modification date filter instead the purchase date filter.\n",
             "in": "query",
             "required": true,
             "type": "string",
@@ -169,16 +318,18 @@
               "Content-Encoding": {
                 "description": "The response is zipped to reduce traffic.",
                 "type": "string",
-                "collectionFormat": "csv",
-                "items": {
-                  "type": "string"
-                },
                 "x-example": "gzip"
               }
             },
             "schema": {
               "$ref": "#/definitions/getOrderListResponse"
             }
+          },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -220,11 +371,14 @@
           "304": {
             "$ref": "#/responses/304_NotModified"
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
+          },
           "404": {
-            "description": "Order not found",
-            "schema": {
-              "$ref": "#/definitions/errorResponseMessage"
-            }
+            "$ref": "#/responses/404_Order_Not_Found"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -232,7 +386,7 @@
         }
       }
     },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/message": {
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{orderChangeId}/message": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
@@ -250,7 +404,7 @@
             "$ref": "#/parameters/marketplaceOrderIdParameter"
           },
           {
-            "$ref": "#/parameters/executionIdParameter"
+            "$ref": "#/parameters/orderChangeIdParameter"
           },
           {
             "$ref": "#/parameters/credentialParameter"
@@ -267,17 +421,11 @@
           "202": {
             "description": "The order change message have been accepted, please check the order change status response."
           },
-          "404": {
-            "description": "Order or execution not found",
-            "schema": {
-              "$ref": "#/definitions/errorResponseMessage"
-            }
-          },
           "400": {
-            "description": "The request contains bad parameters",
-            "schema": {
-              "$ref": "#/definitions/errorResponseMessage"
-            }
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -285,7 +433,7 @@
         }
       }
     },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/status": {
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{orderChangeId}/status": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
@@ -304,7 +452,7 @@
             "$ref": "#/parameters/marketplaceOrderIdParameter"
           },
           {
-            "$ref": "#/parameters/executionIdParameter"
+            "$ref": "#/parameters/orderChangeIdParameter"
           },
           {
             "$ref": "#/parameters/credentialParameter"
@@ -317,14 +465,14 @@
               "$ref": "#/definitions/orderChangeStatusResponse"
             }
           },
-          "404": {
-            "description": "Order or execution not found",
-            "schema": {
-              "$ref": "#/definitions/errorResponseMessage"
-            }
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
           },
-          "409": {
-            "description": "Order change status not yet available"
+          "404": {
+            "$ref": "#/responses/404_OrderChangeId_Not_Found"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -332,13 +480,13 @@
         }
       }
     },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/{marketplaceOrderId}/changes/{executionId}/exchangedMessages": {
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPTraceId}": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
         ],
         "x-tagGroups": "Order Management",
-        "operationId": "GetOrderChangeExchangedMessages",
+        "operationId": "GetOrderExchangedMessages",
         "summary": "Get the order change exchanged messages with the marketplace",
         "parameters": [
           {
@@ -348,30 +496,28 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/marketplaceOrderIdParameter"
-          },
-          {
-            "$ref": "#/parameters/executionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
+            "name": "beezUPTraceId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "format": "Guid"
           }
         ],
         "responses": {
           "200": {
             "description": "The exchanged messages are retrieved",
             "schema": {
-              "$ref": "#/definitions/marketplaceOrderChangeStatus"
+              "$ref": "#/definitions/getOrderExchangedMessagesResponse"
             }
           },
           "404": {
-            "description": "Order or execution not found",
-            "schema": {
-              "$ref": "#/definitions/errorResponseMessage"
-            }
+            "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
           },
           "409": {
-            "description": "Exchanged messages not yet available"
+            "$ref": "#/responses/409_Not_Yet_Available"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -381,37 +527,6 @@
     }
   },
   "definitions": {
-    "marketplaceOrderChangeType": {
-      "type": "string"
-    },
-    "orderChangeStatusResponse": {
-      "type": "object",
-      "required": [
-        "beezUPOrderChangeStatus"
-      ],
-      "properties": {
-        "marketplaceOrderChangeStatus": {
-          "$ref": "#/definitions/marketplaceOrderChangeStatus"
-        },
-        "beezUPOrderChangeStatus": {
-          "$ref": "#/definitions/beezUPOrderChangeStatus"
-        },
-        "errorMessage": {
-          "type": "string"
-        }
-      }
-    },
-    "marketplaceOrderChangeStatus": {
-      "type": "string"
-    },
-    "beezUPOrderChangeStatus": {
-      "type": "string",
-      "enum": [
-        "inProgress",
-        "succeed",
-        "failed"
-      ]
-    },
     "getOrderListResponse": {
       "type": "object",
       "required": [
@@ -453,6 +568,30 @@
             "$ref": "#/definitions/marketplaceOrderItem"
           }
         }
+      }
+    },
+    "orderChangeStatusResponse": {
+      "type": "object",
+      "required": [
+        "beezUPOrderChangeStatus"
+      ],
+      "properties": {
+        "marketplaceOrderChangeStatus": {
+          "$ref": "#/definitions/marketplaceOrderChangeStatus"
+        },
+        "beezUPOrderChangeStatus": {
+          "$ref": "#/definitions/beezUPOrderChangeStatus"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "getOrderExchangedMessagesResponse": {
+      "description": "Order Exchanged Messages Response",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/orderExchangedMessageList"
       }
     },
     "marketplaceOrder": {
@@ -547,6 +686,35 @@
       "type": "object",
       "additionalProperties": {
         "type": "string"
+      }
+    },
+    "orderApiOperationName": {
+      "type": "string",
+      "enum": [
+        "HealthCheckGatewayOrderApi",
+        "GetOrderList",
+        "GetOrder",
+        "PushOrderChangeMessage",
+        "CheckOrderChangeStatus",
+        "GetOrderExchangedMessages"
+      ]
+    },
+    "orderExchangedMessageList": {
+      "type": "object",
+      "required": [
+        "operationName"
+      ],
+      "properties": {
+        "operationName": {
+          "$ref": "#/definitions/orderApiOperationName"
+        },
+        "marketplaceExchangedMessages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/exchangedMessagesItem"
+          }
+        }
       }
     },
     "deliveryMethod": {
@@ -1548,6 +1716,37 @@
           }
         }
       ]
+    },
+    "exchangedMessagesItem": {
+      "type": "object",
+      "required": [
+        "operationName",
+        "requestUri",
+        "responseUri",
+        "requestUtcDate",
+        "responseUtcDate"
+      ],
+      "properties": {
+        "operationName": {
+          "type": "string"
+        },
+        "requestUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "responseUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "requestUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "responseUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     },
     "BeezUP.Common.PaginationRequestParameters": {
       "type": "object",
@@ -2658,8 +2857,8 @@
     }
   ],
   "parameters": {
-    "executionIdParameter": {
-      "name": "executionId",
+    "orderChangeIdParameter": {
+      "name": "orderChangeId",
       "in": "path",
       "required": true,
       "type": "string",
@@ -2700,6 +2899,14 @@
       "format": "CorrelationId",
       "required": true,
       "description": "It's the guid corresponding to the operation.\n"
+    },
+    "beezUPTraceIdHeaderParameter": {
+      "name": "x-BeezUP-TraceId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP trace id related to this call. All traces must use this id to be able to follow it."
     },
     "pageNumberQueryStringParameter": {
       "name": "pageNumber",
@@ -2823,119 +3030,6 @@
       "minimum": 25,
       "maximum": 100,
       "x-example": 25
-    }
-  },
-  "responses": {
-    "GeneralError": {
-      "description": "Occurs when something goes wrong",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "304_NotModified": {
-      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
-      "headers": {
-        "Last-Modified": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
-        },
-        "ETag": {
-          "type": "string",
-          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-        }
-      }
-    },
-    "412_PreConditionFailed": {
-      "description": "The ETag sent in the http header If-Match did not match with the current version. Please refresh the information related to this resource.",
-      "headers": {
-        "ETag": {
-          "type": "string",
-          "description": "The ETag value to identify the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-        }
-      }
-    },
-    "merchantNotFound": {
-      "description": "The merchant code is not found.",
-      "x-exceptions": [
-        "MerchantCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "marketplaceNotFound": {
-      "description": "The marketplace code is not found.",
-      "x-exceptions": [
-        "MarketplaceCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "invalidMarketplaceCredential": {
-      "description": "The marketplace credential is invalid",
-      "x-exceptions": [
-        "InvalidMarketplaceCredentialException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "merchantOrMarketplaceNotFound": {
-      "description": "The merchant code or marketplace code is not found.",
-      "x-exceptions": [
-        "MarketplaceCodeNotFoundException",
-        "MerchantCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "merchantCodeAlreadyUsed": {
-      "description": "The merchant code is not available",
-      "x-exceptions": [
-        "MerchantCodeAlreadyUsedException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "invalidMerchantCode": {
-      "description": "The merchant code is different from the state",
-      "x-exceptions": [
-        "InvalidMerchantCodeException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "notOfferSourceMarketplace": {
-      "description": "The marketplace is not the offer source",
-      "x-exceptions": [
-        "NotOfferSourceMarketplaceException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "subscriptionNotAccepted": {
-      "description": "The subscription is not accepted by the marketplace",
-      "x-exceptions": [
-        "SubscriptionNotAcceptedException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/userErrorMessage"
-      }
-    },
-    "credentialNotConfigured": {
-      "description": "The credential is not configured for the marketplace",
-      "x-exceptions": [
-        "CredentialNotConfiguredException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/userErrorMessage"
-      }
     }
   }
 }

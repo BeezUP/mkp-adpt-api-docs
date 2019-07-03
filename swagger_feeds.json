@@ -54,6 +54,167 @@
       "x-displayName": "Publication"
     }
   ],
+  "responses": {
+    "404_Publication_NotFound": {
+      "description": "The combination of MarketplaceBusinessCode, AccountId and publication id is not found",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "400_MBC_Invalid": {
+      "description": "The marketplace business code is invalid is invalid",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "409_Publication_Already_Completed": {
+      "description": "The publication id is already completed",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "409_Publication_Already_Exists": {
+      "description": "The publication id  already exists",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "503_Marketplace_Down": {
+      "description": "The marketplace has an invalid response",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "400_MBC_Or_Request_Invalid": {
+      "description": "The marketplace business code is invalid or the request is invalid",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "409_Not_Yet_Available": {
+      "description": "Resource not yet available",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "404_BeezUP_TraceId_NotFound": {
+      "description": "BeezUP Trace Id is not found",
+      "schema": {
+        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+      }
+    },
+    "GeneralError": {
+      "description": "Occurs when something goes wrong",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "304_NotModified": {
+      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
+      "headers": {
+        "Last-Modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
+        },
+        "ETag": {
+          "type": "string",
+          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "412_PreConditionFailed": {
+      "description": "The ETag sent in the http header If-Match did not match with the current version. Please refresh the information related to this resource.",
+      "headers": {
+        "ETag": {
+          "type": "string",
+          "description": "The ETag value to identify the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "merchantNotFound": {
+      "description": "The merchant code is not found.",
+      "x-exceptions": [
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "marketplaceNotFound": {
+      "description": "The marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMarketplaceCredential": {
+      "description": "The marketplace credential is invalid",
+      "x-exceptions": [
+        "InvalidMarketplaceCredentialException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantOrMarketplaceNotFound": {
+      "description": "The merchant code or marketplace code is not found.",
+      "x-exceptions": [
+        "MarketplaceCodeNotFoundException",
+        "MerchantCodeNotFoundException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "merchantCodeAlreadyUsed": {
+      "description": "The merchant code is not available",
+      "x-exceptions": [
+        "MerchantCodeAlreadyUsedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "invalidMerchantCode": {
+      "description": "The merchant code is different from the state",
+      "x-exceptions": [
+        "InvalidMerchantCodeException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "notOfferSourceMarketplace": {
+      "description": "The marketplace is not the offer source",
+      "x-exceptions": [
+        "NotOfferSourceMarketplaceException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "subscriptionNotAccepted": {
+      "description": "The subscription is not accepted by the marketplace",
+      "x-exceptions": [
+        "SubscriptionNotAcceptedException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    },
+    "credentialNotConfigured": {
+      "description": "The credential is not configured for the marketplace",
+      "x-exceptions": [
+        "CredentialNotConfiguredException"
+      ],
+      "schema": {
+        "$ref": "#/definitions/userErrorMessage"
+      }
+    }
+  },
   "parameters": {
     "publicationIdParameter": {
       "name": "publicationId",
@@ -88,6 +249,14 @@
       "format": "CorrelationId",
       "required": true,
       "description": "It's the guid corresponding to the operation.\n"
+    },
+    "beezUPTraceIdHeaderParameter": {
+      "name": "x-BeezUP-TraceId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP trace id related to this call. All traces must use this id to be able to follow it."
     },
     "pageNumberQueryStringParameter": {
       "name": "pageNumber",
@@ -219,22 +388,31 @@
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
         ],
-        "summary": "Ping the status of your feed system",
-        "operationId": "PingGatewayFeedApi",
+        "summary": "Get the Health check of your feed system",
+        "operationId": "HealthCheckGatewayFeedApi",
         "parameters": [
           {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
           }
         ],
         "responses": {
           "200": {
-            "description": "The status of the API is up!",
+            "description": "The health check of the API",
             "schema": {
-              "$ref": "#/definitions/healthCheck"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/healthCheck"
+              }
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
+          },
           "503": {
-            "description": "The status of your API is down..."
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -263,6 +441,9 @@
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+          },
+          {
             "name": "request",
             "in": "body",
             "required": true,
@@ -276,55 +457,16 @@
             "description": "The feed publication has been started!"
           },
           "400": {
-            "$ref": "#/responses/GeneralError"
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
           },
           "404": {
-            "description": "The combination of MarketplaceBusinessCode and AccountId is invalid"
+            "$ref": "#/responses/404_Publication_NotFound"
           },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/complete": {
-      "post": {
-        "tags": [
-          "Marketplace Gateway API - Feeds - Publication"
-        ],
-        "summary": "Complete the feed publication",
-        "operationId": "CompleteFeedPublication",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          "409": {
+            "$ref": "#/responses/409_Publication_Already_Exists"
           },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
-          },
-          {
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/completeFeedPublicationRequest"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The feed comands has been completed!"
-          },
-          "400": {
-            "$ref": "#/responses/GeneralError"
-          },
-          "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -353,15 +495,14 @@
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+          },
+          {
             "name": "Content-Encoding",
             "description": "The content of the body is compressed to reduce traffic",
             "in": "header",
             "required": true,
             "type": "string",
-            "collectionFormat": "csv",
-            "items": {
-              "type": "string"
-            },
             "x-example": "gzip"
           },
           {
@@ -377,10 +518,70 @@
             "description": "The feed messages have been registered!"
           },
           "400": {
-            "$ref": "#/responses/GeneralError"
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
           },
           "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+            "$ref": "#/responses/404_Publication_NotFound"
+          },
+          "409": {
+            "$ref": "#/responses/409_Publication_Already_Completed"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/complete": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Complete the feed publication",
+        "operationId": "CompleteFeedPublication",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/completeFeedPublicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The feed comands has been completed!"
+          },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
+          "404": {
+            "$ref": "#/responses/404_Publication_NotFound"
+          },
+          "409": {
+            "$ref": "#/responses/409_Publication_Already_Completed"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -407,6 +608,9 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+          },
+          {
             "$ref": "#/parameters/publicationIdParameter"
           }
         ],
@@ -417,11 +621,17 @@
               "$ref": "#/definitions/checkFeedPublicationStatusResponse"
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
           "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+            "$ref": "#/responses/404_Publication_NotFound"
           },
           "409": {
-            "description": "Publication status not yet available"
+            "$ref": "#/responses/409_Not_Yet_Available"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -448,6 +658,9 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
+            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+          },
+          {
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
@@ -456,10 +669,6 @@
             "description": "BeezUP will indicates the expected content encoding.",
             "required": true,
             "type": "string",
-            "collectionFormat": "csv",
-            "items": {
-              "type": "string"
-            },
             "x-example": "gzip"
           }
         ],
@@ -468,12 +677,8 @@
             "description": "The error reporting is retrieved",
             "headers": {
               "Content-Encoding": {
-                "description": "The response is zipped to reduce traffic.",
+                "description": "The response is compressed to reduce traffic.",
                 "type": "string",
-                "collectionFormat": "csv",
-                "items": {
-                  "type": "string"
-                },
                 "x-example": "gzip"
               }
             },
@@ -481,11 +686,17 @@
               "$ref": "#/definitions/getFeedPublicationReportingResponse"
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
           "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+            "$ref": "#/responses/404_Publication_NotFound"
           },
           "409": {
-            "description": "Reporting not yet available"
+            "$ref": "#/responses/409_Not_Yet_Available"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -493,7 +704,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/exchangedMessages": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPTraceId}": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -509,10 +720,11 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
+            "name": "beezUPTraceId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "format": "Guid"
           }
         ],
         "responses": {
@@ -522,11 +734,17 @@
               "$ref": "#/definitions/getFeedPublicationExchangedMessagesResponse"
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
           "404": {
-            "description": "The combination of MarketplaceBusinessCode, AccountId and PublicationId is invalid"
+            "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
           },
           "409": {
-            "description": "Reporting not yet available"
+            "$ref": "#/responses/409_Not_Yet_Available"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
@@ -609,7 +827,7 @@
       "description": "Publication Exchanged Messages Response",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/publicationExchangedMessage"
+        "$ref": "#/definitions/feedPublicationExchangedMessageList"
       }
     },
     "feedType": {
@@ -644,13 +862,13 @@
       ],
       "default": "notStarted"
     },
-    "operationName": {
+    "feedApiOperationName": {
       "type": "string",
       "enum": [
-        "pingGatewayFeedApi",
+        "healthCheckGatewayFeedApi",
         "startFeedPublication",
-        "completeFeedPublication",
         "pushMerchantFeedMessages",
+        "completeFeedPublication",
         "checkPublicationStatus",
         "getPublicationReporting",
         "getPublicationExchangedMessages"
@@ -751,50 +969,20 @@
         }
       }
     },
-    "publicationExchangedMessagesItem": {
-      "type": "object",
-      "required": [
-        "marketplaceOperationName",
-        "requestUri",
-        "responseUri",
-        "requestUtcDate",
-        "responseUtcDate"
-      ],
-      "properties": {
-        "marketplaceOperationName": {
-          "type": "string"
-        },
-        "requestUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "responseUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "requestUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "responseUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "publicationExchangedMessage": {
+    "feedPublicationExchangedMessageList": {
       "type": "object",
       "required": [
         "operationName"
       ],
       "properties": {
         "operationName": {
-          "$ref": "#/definitions/operationName"
+          "$ref": "#/definitions/feedApiOperationName"
         },
-        "exchangedMessages": {
+        "marketplaceExchangedMessages": {
           "type": "array",
+          "minItems": 1,
           "items": {
-            "$ref": "#/definitions/publicationExchangedMessagesItem"
+            "$ref": "#/definitions/exchangedMessagesItem"
           }
         }
       }
@@ -1798,6 +1986,37 @@
           }
         }
       ]
+    },
+    "exchangedMessagesItem": {
+      "type": "object",
+      "required": [
+        "operationName",
+        "requestUri",
+        "responseUri",
+        "requestUtcDate",
+        "responseUtcDate"
+      ],
+      "properties": {
+        "operationName": {
+          "type": "string"
+        },
+        "requestUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "responseUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "requestUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "responseUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     },
     "BeezUP.Common.PaginationRequestParameters": {
       "type": "object",
@@ -2906,118 +3125,5 @@
         "Marketplace Gateway API - Feeds - Publication"
       ]
     }
-  ],
-  "responses": {
-    "GeneralError": {
-      "description": "Occurs when something goes wrong",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "304_NotModified": {
-      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
-      "headers": {
-        "Last-Modified": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
-        },
-        "ETag": {
-          "type": "string",
-          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-        }
-      }
-    },
-    "412_PreConditionFailed": {
-      "description": "The ETag sent in the http header If-Match did not match with the current version. Please refresh the information related to this resource.",
-      "headers": {
-        "ETag": {
-          "type": "string",
-          "description": "The ETag value to identify the resource.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-        }
-      }
-    },
-    "merchantNotFound": {
-      "description": "The merchant code is not found.",
-      "x-exceptions": [
-        "MerchantCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "marketplaceNotFound": {
-      "description": "The marketplace code is not found.",
-      "x-exceptions": [
-        "MarketplaceCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "invalidMarketplaceCredential": {
-      "description": "The marketplace credential is invalid",
-      "x-exceptions": [
-        "InvalidMarketplaceCredentialException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "merchantOrMarketplaceNotFound": {
-      "description": "The merchant code or marketplace code is not found.",
-      "x-exceptions": [
-        "MarketplaceCodeNotFoundException",
-        "MerchantCodeNotFoundException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "merchantCodeAlreadyUsed": {
-      "description": "The merchant code is not available",
-      "x-exceptions": [
-        "MerchantCodeAlreadyUsedException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "invalidMerchantCode": {
-      "description": "The merchant code is different from the state",
-      "x-exceptions": [
-        "InvalidMerchantCodeException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "notOfferSourceMarketplace": {
-      "description": "The marketplace is not the offer source",
-      "x-exceptions": [
-        "NotOfferSourceMarketplaceException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "subscriptionNotAccepted": {
-      "description": "The subscription is not accepted by the marketplace",
-      "x-exceptions": [
-        "SubscriptionNotAcceptedException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/userErrorMessage"
-      }
-    },
-    "credentialNotConfigured": {
-      "description": "The credential is not configured for the marketplace",
-      "x-exceptions": [
-        "CredentialNotConfiguredException"
-      ],
-      "schema": {
-        "$ref": "#/definitions/userErrorMessage"
-      }
-    }
-  }
+  ]
 }
