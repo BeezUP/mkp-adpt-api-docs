@@ -85,22 +85,6 @@
       "type": "string",
       "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
     },
-    "executionIdParameter": {
-      "name": "executionId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "guid"
-    },
-    "marketplaceOrderIdParameter": {
-      "name": "marketplaceOrderId",
-      "description": "The marketplace order identifier",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "MarketplaceOrderId",
-      "x-example": "M1234X10"
-    },
     "correlationIdParameter": {
       "name": "correlationId",
       "in": "path",
@@ -554,7 +538,7 @@
         }
       }
     },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/ping": {
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/health": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
@@ -568,7 +552,10 @@
         ],
         "responses": {
           "200": {
-            "description": "The status of the API is up!"
+            "description": "The status of the API is up!",
+            "schema": {
+              "$ref": "#/definitions/healthCheck"
+            }
           },
           "503": {
             "description": "The status of your API is down..."
@@ -610,14 +597,10 @@
             "x-example": "gzip"
           },
           {
-            "name": "pageNumber",
-            "description": "The page number of the order list",
-            "in": "query",
-            "required": true,
-            "type": "integer",
-            "format": "int32",
-            "minimum": 1,
-            "x-example": 1
+            "$ref": "#/parameters/pageNumberQueryStringParameter"
+          },
+          {
+            "$ref": "#/parameters/pageSizeQueryStringParameter"
           },
           {
             "name": "pageSize",
@@ -631,16 +614,32 @@
             "x-example": 25
           },
           {
-            "name": "orderMarketplaceLastModificationUtcDate",
-            "description": "The marketplace last modification utc date already received by BeezUP. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
+            "name": "orderMarketplaceModificationBeginUtcDate",
+            "description": "The marketplace modification begin utc date already received by BeezUP. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
             "in": "query",
             "type": "string",
             "format": "date-time",
             "x-example": "2019-06-24T23:03:12.123Z"
           },
           {
-            "name": "orderLastPurchaseUtcDate",
-            "description": "The order last purchase UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
+            "name": "orderMarketplaceModificationEndUtcDate",
+            "description": "The marketplace modification end utc date. \nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: If the marketplace allows the filter with last modification date, we recommend you to use this filter in priority instead of the purchase date to avoid useless pooling with the marketplace.\n",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "x-example": "2019-06-24T23:03:12.123Z"
+          },
+          {
+            "name": "orderPurchaseBeginUtcDate",
+            "description": "The order purchase begin UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "x-example": "2019-06-24T23:03:12.123Z"
+          },
+          {
+            "name": "orderLastPurchaseEndUtcDate",
+            "description": "The order purchase end UTC date already received by BeezUP.\nBeezUP expects that all orders are more recent than this date.\nRECOMMANDATION: We send this information in case where the marketplace does not have any order last modification date.\nIf the marketplace allows the filter with last modification date than use the last modification date filter instead the purchase date filter.\n",
             "in": "query",
             "type": "string",
             "format": "date-time",
@@ -662,7 +661,7 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/marketplaceOrderList"
+              "$ref": "#/definitions/getOrderListResponse"
             }
           },
           "default": {
@@ -686,27 +685,20 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "$ref": "#/parameters/executionIdParameter"
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
           },
           {
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/marketplaceOrderIdParameter"
-          },
-          {
-            "name": "If-None-Match",
-            "type": "string",
-            "in": "header",
-            "required": false,
-            "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+            "$ref": "#/parameters/ifNoneMatchParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "The order is retrieved",
             "schema": {
-              "$ref": "#/definitions/marketplaceOrder"
+              "$ref": "#/definitions/getOrderResponse"
             }
           },
           "304": {
@@ -739,19 +731,19 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
+            "$ref": "#/parameters/marketplaceOrderIdParameter"
+          },
+          {
             "$ref": "#/parameters/executionIdParameter"
           },
           {
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/marketplaceOrderIdParameter"
-          },
-          {
             "name": "request",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/orderChangeMessage"
+              "$ref": "#/definitions/pushOrderChangeMessageRequest"
             }
           }
         ],
@@ -873,130 +865,7 @@
     }
   },
   "definitions": {
-    "marketplaceOrderList": {
-      "type": "object",
-      "properties": {
-        "orders": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/marketplaceOrder"
-          }
-        }
-      }
-    },
-    "marketplaceOrder": {
-      "type": "object",
-      "required": [
-        "marketplaceOrderId",
-        "orderPurchaseUtcDate",
-        "marketplaceOrderStatus",
-        "marketplaceOrderLastModificationUtcDate",
-        "marketplaceOrderETag",
-        "properties",
-        "items"
-      ],
-      "properties": {
-        "marketplaceOrderId": {
-          "$ref": "#/definitions/marketplaceOrderId"
-        },
-        "orderPurchaseUtcDate": {
-          "$ref": "#/definitions/orderPurchaseUtcDate"
-        },
-        "marketplaceOrderStatus": {
-          "$ref": "#/definitions/marketplaceOrderStatus"
-        },
-        "marketplaceOrderLastModificationUtcDate": {
-          "$ref": "#/definitions/marketplaceOrderLastModificationUtcDate"
-        },
-        "marketplaceOrderETag": {
-          "$ref": "#/definitions/marketplaceOrderETag"
-        },
-        "properties": {
-          "$ref": "#/definitions/marketplaceOrderProperties"
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/marketplaceOrderItem"
-          }
-        }
-      }
-    },
-    "marketplaceOrderProperties": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "orderChangeMessage": {
-      "type": "object",
-      "required": [
-        "beezUPOrderChangeType",
-        "marketplaceOrderItems"
-      ],
-      "properties": {
-        "beezUPOrderChangeType": {
-          "$ref": "#/definitions/beezUPOrderChangeType"
-        },
-        "parameters": {
-          "$ref": "#/definitions/orderChangeParameters"
-        },
-        "marketplaceOrderItems": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/marketplaceOrderItem"
-          }
-        }
-      }
-    },
-    "marketplaceOrderItem": {
-      "type": "object",
-      "required": [
-        "properties"
-      ],
-      "properties": {
-        "marketplaceOrderItemId": {
-          "$ref": "#/definitions/marketplaceOrderItemId"
-        },
-        "properties": {
-          "$ref": "#/definitions/marketplaceOrderItemProperties"
-        }
-      }
-    },
-    "marketplaceOrderItemProperties": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "orderChangeParameters": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "beezUPOrderChangeType": {
-      "type": "string"
-    },
     "marketplaceOrderChangeType": {
-      "type": "string"
-    },
-    "marketplaceOrderId": {
-      "description": "The marketplace order identifier",
-      "type": "string"
-    },
-    "orderPurchaseUtcDate": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "marketplaceOrderLastModificationUtcDate": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "marketplaceOrderStatus": {
-      "type": "string"
-    },
-    "marketplaceOrderItemId": {
       "type": "string"
     },
     "orderChangeStatusResponse": {
@@ -1022,13 +891,10 @@
     "beezUPOrderChangeStatus": {
       "type": "string",
       "enum": [
-        "InProgress",
-        "Succeed",
-        "Failed"
+        "inProgress",
+        "succeed",
+        "failed"
       ]
-    },
-    "marketplaceOrderETag": {
-      "type": "string"
     },
     "startFeedPublicationRequest": {
       "type": "object",
