@@ -1071,7 +1071,7 @@
         ],
         "x-tagGroups": "Order Management",
         "operationId": "GetOrderExchangedMessages",
-        "summary": "Get the order change exchanged messages with the marketplace",
+        "summary": "Get the order exchanged messages with the marketplace",
         "parameters": [
           {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
