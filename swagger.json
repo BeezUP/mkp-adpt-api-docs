@@ -25,7 +25,7 @@
     "applicationShortName": "MKP.ADPT.Feeds.WS",
     "appRoot": "BZ.MKP.ADPT.Feeds.WebService",
     "namespace": "BZ.MKP.ADPT.Feeds.WebService",
-    "apiName": "MkpGatewayOffersV1",
+    "apiName": "MkpGatewayFeedsV1",
     "useBeezUPFrameworkVersion2": true,
     "comment": "First document\n",
     "using": [
@@ -62,25 +62,25 @@
     "404_Publication_NotFound": {
       "description": "The combination of MarketplaceBusinessCode, AccountId and publication id is not found",
       "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+        "$ref": "#/definitions/errorResponseMessage"
       }
     },
     "400_MBC_Invalid": {
       "description": "The marketplace business code is invalid is invalid",
       "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+        "$ref": "#/definitions/errorResponseMessage"
       }
     },
     "409_Publication_Already_Completed": {
       "description": "The publication id is already completed",
       "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+        "$ref": "#/definitions/errorResponseMessage"
       }
     },
     "409_Publication_Already_Exists": {
       "description": "The publication id  already exists",
       "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
+        "$ref": "#/definitions/errorResponseMessage"
       }
     },
     "404_OrderChangeId_Not_Found": {
@@ -93,39 +93,6 @@
       "description": "Order not found",
       "schema": {
         "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "503_Marketplace_Down": {
-      "description": "The marketplace has an invalid response",
-      "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
-      }
-    },
-    "400_MBC_Or_Request_Invalid": {
-      "description": "The marketplace business code is invalid or the request is invalid",
-      "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
-      }
-    },
-    "409_Not_Yet_Available": {
-      "description": "Resource not yet available",
-      "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
-      }
-    },
-    "404_BeezUP_TraceId_NotFound": {
-      "description": "BeezUP Trace Id is not found",
-      "schema": {
-        "$ref": "#/definitions/BeezUP.Common.ErrorResponseMessage"
-      }
-    },
-    "200_HealthCheck": {
-      "description": "The health check of the API",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/healthCheck"
-        }
       }
     },
     "GeneralError": {
@@ -146,6 +113,39 @@
           "type": "string",
           "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
         }
+      }
+    },
+    "200_HealthCheck": {
+      "description": "The health check of the API",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/healthCheck"
+        }
+      }
+    },
+    "503_Marketplace_Down": {
+      "description": "The marketplace has an invalid response",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "400_MBC_Or_Request_Invalid": {
+      "description": "The marketplace business code is invalid or the request is invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "409_Not_Yet_Available": {
+      "description": "Resource not yet available",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "404_BeezUP_TraceId_NotFound": {
+      "description": "BeezUP Trace Id is not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
       }
     },
     "412_PreConditionFailed": {
@@ -264,6 +264,22 @@
       "format": "MarketplaceOrderId",
       "x-example": "M1234X10"
     },
+    "beezUPRequestIdHeaderParameter": {
+      "name": "x-BeezUP-RequestId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
+    },
+    "beezUPCorrelationIdHeaderParameter": {
+      "name": "x-BeezUP-CorrelationId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
+    },
     "marketplaceBusinessCodeParameter": {
       "name": "marketplaceBusinessCode",
       "in": "path",
@@ -282,22 +298,6 @@
       "required": true,
       "type": "string",
       "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
-    },
-    "correlationIdParameter": {
-      "name": "correlationId",
-      "in": "path",
-      "type": "string",
-      "format": "CorrelationId",
-      "required": true,
-      "description": "It's the guid corresponding to the operation.\n"
-    },
-    "beezUPTraceIdHeaderParameter": {
-      "name": "x-BeezUP-TraceId",
-      "in": "header",
-      "type": "string",
-      "format": "Guid",
-      "required": true,
-      "description": "Indicates to the server the BeezUP trace id related to this call. All traces must use this id to be able to follow it."
     },
     "pageNumberQueryStringParameter": {
       "name": "pageNumber",
@@ -319,9 +319,45 @@
       "format": "int32",
       "minimum": 25,
       "x-minimum": 25,
-      "maximum": 100,
-      "x-maximum": 100,
       "x-example": 25
+    },
+    "acceptEncodingRequiredParameter": {
+      "name": "Accept-Encoding",
+      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string"
+    },
+    "ifNoneMatchRequiredParameter": {
+      "name": "If-None-Match",
+      "type": "string",
+      "in": "header",
+      "required": true,
+      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+    },
+    "contentEncodingRequiredParameter": {
+      "name": "Content-Encoding",
+      "description": "The content of the body is compressed to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-example": "gzip"
+    },
+    "correlationIdParameter": {
+      "name": "correlationId",
+      "in": "path",
+      "type": "string",
+      "format": "CorrelationId",
+      "required": true,
+      "description": "It's the guid corresponding to the operation.\n"
+    },
+    "beezUPTraceIdHeaderParameter": {
+      "name": "x-BeezUP-TraceId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP trace id related to this call. All traces must use this id to be able to follow it."
     },
     "ifNoneMatchParameter": {
       "name": "If-None-Match",
@@ -342,17 +378,6 @@
       "description": "Indicates that the client accepts the following languages.",
       "in": "header",
       "required": false,
-      "type": "array",
-      "collectionFormat": "csv",
-      "items": {
-        "type": "string"
-      }
-    },
-    "acceptEncodingRequiredParameter": {
-      "name": "Accept-Encoding",
-      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
-      "in": "header",
-      "required": true,
       "type": "array",
       "collectionFormat": "csv",
       "items": {
@@ -436,7 +461,10 @@
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           }
         ],
         "responses": {
@@ -476,7 +504,10 @@
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
             "name": "request",
@@ -530,15 +561,13 @@
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
           },
           {
-            "name": "Content-Encoding",
-            "description": "The content of the body is compressed to reduce traffic",
-            "in": "header",
-            "required": true,
-            "type": "string",
-            "x-example": "gzip"
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/contentEncodingRequiredParameter"
           },
           {
             "name": "request",
@@ -588,7 +617,10 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
             "$ref": "#/parameters/publicationIdParameter"
@@ -643,7 +675,10 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
             "$ref": "#/parameters/publicationIdParameter"
@@ -693,18 +728,16 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/beezUPTraceIdHeaderParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
           {
-            "name": "Accept-Encoding",
-            "in": "header",
-            "description": "BeezUP will indicates the expected content encoding.",
-            "required": true,
-            "type": "string",
-            "x-example": "gzip"
+            "$ref": "#/parameters/acceptEncodingRequiredParameter"
           }
         ],
         "responses": {
@@ -766,7 +799,10 @@
           "200": {
             "description": "The exchanged messages are retrieved",
             "schema": {
-              "$ref": "#/definitions/getFeedPublicationExchangedMessagesResponse"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/exchangedMessages"
+              }
             }
           },
           "400": {
@@ -797,6 +833,12 @@
         "parameters": [
           {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           }
         ],
         "responses": {
@@ -834,12 +876,7 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "name": "Accept-Encoding",
-            "in": "header",
-            "description": "BeezUP will indicates the expected content encoding.",
-            "required": true,
-            "type": "string",
-            "x-example": "gzip"
+            "$ref": "#/parameters/acceptEncodingRequiredParameter"
           },
           {
             "$ref": "#/parameters/pageNumberQueryStringParameter"
@@ -848,15 +885,10 @@
             "$ref": "#/parameters/pageSizeQueryStringParameter"
           },
           {
-            "name": "pageSize",
-            "description": "The expected order count in the order list",
-            "in": "query",
-            "required": true,
-            "type": "integer",
-            "format": "int32",
-            "minimum": 25,
-            "maximum": 2000,
-            "x-example": 25
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
             "name": "orderMarketplaceModificationBeginUtcDate",
@@ -942,7 +974,13 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/ifNoneMatchParameter"
+            "$ref": "#/parameters/ifNoneMatchRequiredParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           }
         ],
         "responses": {
@@ -994,6 +1032,12 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+          },
+          {
             "name": "request",
             "in": "body",
             "schema": {
@@ -1040,6 +1084,12 @@
           },
           {
             "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           }
         ],
         "responses": {
@@ -1064,7 +1114,7 @@
         }
       }
     },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPTraceId}": {
+    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPCorrelationId}": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
@@ -1080,18 +1130,21 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "name": "beezUPTraceId",
+            "name": "beezUPCorrelationId",
             "in": "path",
             "type": "string",
             "required": true,
-            "format": "Guid"
+            "format": "CorrelationId"
           }
         ],
         "responses": {
           "200": {
             "description": "The exchanged messages are retrieved",
             "schema": {
-              "$ref": "#/definitions/getOrderExchangedMessagesResponse"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/exchangedMessages"
+              }
             }
           },
           "404": {
@@ -1283,24 +1336,6 @@
         "GetOrderExchangedMessages"
       ]
     },
-    "orderExchangedMessageList": {
-      "type": "object",
-      "required": [
-        "operationName"
-      ],
-      "properties": {
-        "operationName": {
-          "$ref": "#/definitions/orderApiOperationName"
-        },
-        "marketplaceExchangedMessages": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/exchangedMessagesItem"
-          }
-        }
-      }
-    },
     "marketplaceOrderChangeStatus": {
       "type": "string"
     },
@@ -1332,7 +1367,7 @@
       ],
       "properties": {
         "processingStatus": {
-          "$ref": "#/definitions/processingStatus"
+          "$ref": "#/definitions/feedPublicationStatus"
         },
         "errorMessage": {
           "type": "string"
@@ -1529,23 +1564,186 @@
         }
       }
     },
-    "feedPublicationExchangedMessageList": {
+    "errorResponseMessage": {
       "type": "object",
       "required": [
-        "operationName"
+        "errors"
+      ],
+      "properties": {
+        "errors": {
+          "type": "array",
+          "uniqueItems": false,
+          "minLength": 1,
+          "items": {
+            "$ref": "#/definitions/userErrorMessage"
+          }
+        }
+      }
+    },
+    "docUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The documentation related to this operation.",
+      "example": "https://api-docs.beezup.com/#operation/EnableChannelCatalog"
+    },
+    "userErrorMessage": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "docUrl": {
+          "$ref": "#/definitions/docUrl"
+        },
+        "code": {
+          "type": "string",
+          "description": "the error code. The error code can be a pattern containing the argument's name",
+          "example": "CatalogImportationAlreadyInProgress(ExecutionId currentCatalogImportationId)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The error message",
+          "example": "There is already an importation in progress: b24d0dd8-a561-478a-9b26-34f573f03527\n"
+        },
+        "cultureName": {
+          "type": "string",
+          "description": "If the error is translated, the culture name will be indicated",
+          "example": "en",
+          "x-lov": "Go2CultureName"
+        },
+        "arguments": {
+          "type": "array",
+          "description": "a dictionary string/object",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The key of the parameter",
+                "example": "currentCatalogImportationId"
+              },
+              "value": {
+                "type": "object",
+                "description": "The value of the parameter. Depending to the type.",
+                "example": "b24d0dd8-a561-478a-9b26-34f573f03527"
+              }
+            }
+          }
+        }
+      }
+    },
+    "healthCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Health check name",
+          "example": "MyDatabaseCheck"
+        },
+        "message": {
+          "type": "string",
+          "description": "Gets the status message of the check.",
+          "example": "Database connection OK"
+        },
+        "status": {
+          "$ref": "#/definitions/healthCheckStatus"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "healthCheckStatus": {
+      "type": "string",
+      "description": "Possible status values of a health check result.\n* degraded:  The check is degraded, failing but not critical\n* healthy: The check is healthy\n* ignored: The check was ignored\n* unhealthy:  The check is unhealthy\n",
+      "enum": [
+        "degraded",
+        "healthy",
+        "ignored",
+        "unhealthy"
+      ]
+    },
+    "sku": {
+      "type": "string",
+      "description": "The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. http://schema.org/sku",
+      "maxLength": 50
+    },
+    "exchangedMessages": {
+      "type": "object",
+      "required": [
+        "operationName",
+        "requestId"
       ],
       "properties": {
         "operationName": {
-          "$ref": "#/definitions/feedApiOperationName"
+          "type": "string"
+        },
+        "requestId": {
+          "$ref": "#/definitions/requestId"
         },
         "marketplaceExchangedMessages": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "$ref": "#/definitions/exchangedMessagesItem"
           }
         }
       }
+    },
+    "exchangedMessagesItem": {
+      "type": "object",
+      "required": [
+        "operationName",
+        "requestUri",
+        "responseUri",
+        "requestUtcDate",
+        "responseUtcDate"
+      ],
+      "properties": {
+        "operationName": {
+          "type": "string"
+        },
+        "requestUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "responseUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "requestUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "responseUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "correlationId": {
+      "type": "string",
+      "description": "The correlation identifier. It's a guid.",
+      "format": "guid"
+    },
+    "requestId": {
+      "type": "string",
+      "description": "The request identifier. It's a guid.",
+      "format": "guid"
+    },
+    "httpUrl": {
+      "description": "The URL <a href=\"https://en.wikipedia.org/wiki/URL\">https://en.wikipedia.org/wiki/URL</a>",
+      "type": "string",
+      "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "x-pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "example": "http://www.mydomain.com"
     },
     "deliveryMethod": {
       "type": "string",
@@ -1573,13 +1771,6 @@
     "userIPAddress": {
       "description": "User IP Address",
       "type": "string"
-    },
-    "correlationId": {
-      "x-exclude": true,
-      "description": "The correlation identifier. It's a guid.",
-      "format": "CorrelationId",
-      "type": "string",
-      "example": "b0d3faea-f881-439f-ba92-02b1168511ea"
     },
     "messageId": {
       "x-exclude": true,
@@ -1659,11 +1850,6 @@
         "IsNull",
         "IsNotNull"
       ]
-    },
-    "sku": {
-      "type": "string",
-      "description": "The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. http://schema.org/sku",
-      "maxLength": 50
     },
     "ean": {
       "type": "string",
@@ -2166,37 +2352,6 @@
         }
       }
     },
-    "httpUrl": {
-      "x-exclude": true,
-      "description": "The URL <a href=\"https://en.wikipedia.org/wiki/URL\">https://en.wikipedia.org/wiki/URL</a>",
-      "type": "string",
-      "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
-      "x-pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
-      "example": "http://www.mydomain.com"
-    },
-    "errorResponseMessage": {
-      "x-exclude": true,
-      "type": "object",
-      "required": [
-        "errors"
-      ],
-      "properties": {
-        "errors": {
-          "type": "array",
-          "uniqueItems": false,
-          "items": {
-            "$ref": "#/definitions/userErrorMessage"
-          }
-        }
-      }
-    },
-    "docUrl": {
-      "x-exclude": true,
-      "type": "string",
-      "format": "uri",
-      "description": "The documentation related to this operation.",
-      "example": "https://api-docs.imn.io/#operation/EnableChannelCatalog"
-    },
     "errorCode": {
       "x-exclude": true,
       "type": "string",
@@ -2209,33 +2364,6 @@
       "description": "If the error is translated, the culture name will be indicated",
       "example": "en",
       "x-lov": "Go2CultureName"
-    },
-    "userErrorMessage": {
-      "x-exclude": true,
-      "type": "object",
-      "required": [
-        "code",
-        "message"
-      ],
-      "properties": {
-        "docUrl": {
-          "$ref": "#/definitions/docUrl"
-        },
-        "code": {
-          "$ref": "#/definitions/errorCode"
-        },
-        "message": {
-          "type": "string",
-          "description": "The error message",
-          "example": "There is already an importation in progress: b24d0dd8-a561-478a-9b26-34f573f03527\n"
-        },
-        "cultureName": {
-          "$ref": "#/definitions/cultureName"
-        },
-        "arguments": {
-          "$ref": "#/definitions/userErrorMessageArguments"
-        }
-      }
     },
     "userErrorMessageArguments": {
       "x-exclude": true,
@@ -2462,40 +2590,6 @@
         "aborted"
       ]
     },
-    "healthCheck": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Health check name",
-          "example": "MyDatabaseCheck"
-        },
-        "message": {
-          "type": "string",
-          "description": "Gets the status message of the check.",
-          "example": "Database connection OK"
-        },
-        "status": {
-          "$ref": "#/definitions/healthCheckStatus"
-        },
-        "data": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "healthCheckStatus": {
-      "type": "string",
-      "description": "Possible status values of a health check result.\n* degraded:  The check is degraded, failing but not critical\n* healthy: The check is healthy\n* ignored: The check was ignored\n* unhealthy:  The check is unhealthy\n",
-      "enum": [
-        "degraded",
-        "healthy",
-        "ignored",
-        "unhealthy"
-      ]
-    },
     "messageBase": {
       "x-exclude": true,
       "type": "object",
@@ -2546,37 +2640,6 @@
           }
         }
       ]
-    },
-    "exchangedMessagesItem": {
-      "type": "object",
-      "required": [
-        "operationName",
-        "requestUri",
-        "responseUri",
-        "requestUtcDate",
-        "responseUtcDate"
-      ],
-      "properties": {
-        "operationName": {
-          "type": "string"
-        },
-        "requestUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "responseUri": {
-          "type": "string",
-          "format": "uri"
-        },
-        "requestUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "responseUtcDate": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
     },
     "BeezUP.Common.PaginationRequestParameters": {
       "type": "object",
