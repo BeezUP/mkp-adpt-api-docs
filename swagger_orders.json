@@ -122,7 +122,7 @@
   },
   "paths": {
     "/marketplace/orders/v1/{marketplaceBusinessCode}/health": {
-      "post": {
+      "get": {
         "tags": [
           "Marketplace Gateway API - Orders - Order Management"
         ],

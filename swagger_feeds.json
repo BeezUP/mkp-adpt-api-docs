@@ -223,7 +223,7 @@
   },
   "paths": {
     "/marketplace/feeds/v1/{marketplaceBusinessCode}/health": {
-      "post": {
+      "get": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
         ],
