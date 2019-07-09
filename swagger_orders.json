@@ -101,6 +101,12 @@
         "$ref": "#/definitions/errorResponseMessage"
       }
     },
+    "400_MBC_Invalid": {
+      "description": "The marketplace business code is invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
     "400_MBC_Or_Request_Invalid": {
       "description": "The marketplace business code is invalid or the request is invalid",
       "schema": {
@@ -776,14 +782,14 @@
     "exchangedMessagesItem": {
       "type": "object",
       "required": [
-        "operationName",
+        "marketplaceOperationName",
         "requestUri",
         "responseUri",
         "requestUtcDate",
         "responseUtcDate"
       ],
       "properties": {
-        "operationName": {
+        "marketplaceOperationName": {
           "type": "string"
         },
         "requestUri": {

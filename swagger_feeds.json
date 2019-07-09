@@ -545,7 +545,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPTraceId}": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPCorrelationId}": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -561,11 +561,11 @@
             "$ref": "#/parameters/accountIdParameter"
           },
           {
-            "name": "beezUPTraceId",
+            "name": "beezUPCorrelationId",
             "in": "path",
             "type": "string",
             "required": true,
-            "format": "Guid"
+            "format": "CorrelationId"
           }
         ],
         "responses": {
@@ -942,14 +942,14 @@
     "exchangedMessagesItem": {
       "type": "object",
       "required": [
-        "operationName",
+        "marketplaceOperationName",
         "requestUri",
         "responseUri",
         "requestUtcDate",
         "responseUtcDate"
       ],
       "properties": {
-        "operationName": {
+        "marketplaceOperationName": {
           "type": "string"
         },
         "requestUri": {
