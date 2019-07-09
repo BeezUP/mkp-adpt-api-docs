@@ -1167,7 +1167,7 @@
       ],
       "properties": {
         "feedType": {
-          "$ref": "#/definitions/feedMessageType"
+          "$ref": "#/definitions/feedType"
         }
       }
     },
