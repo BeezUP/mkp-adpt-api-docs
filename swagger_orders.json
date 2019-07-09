@@ -53,6 +53,111 @@
       "x-displayName": "Order Management"
     }
   ],
+  "parameters": {
+    "paginationContinuationTokenQueryStringParameter": {
+      "name": "paginationContinuationToken",
+      "description": "The pagination continuation token you want to get next page.",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "format": "PaginationContinuationToken"
+    },
+    "orderChangeIdParameter": {
+      "name": "orderChangeId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "guid"
+    },
+    "marketplaceOrderIdParameter": {
+      "name": "marketplaceOrderId",
+      "description": "The marketplace order identifier",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MarketplaceOrderId",
+      "x-example": "M1234X10"
+    },
+    "beezUPRequestIdHeaderParameter": {
+      "name": "x-BeezUP-RequestId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
+    },
+    "beezUPCorrelationIdHeaderParameter": {
+      "name": "x-BeezUP-CorrelationId",
+      "in": "header",
+      "type": "string",
+      "format": "Guid",
+      "required": true,
+      "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
+    },
+    "marketplaceBusinessCodeParameter": {
+      "name": "marketplaceBusinessCode",
+      "in": "path",
+      "required": true,
+      "type": "string"
+    },
+    "accountIdParameter": {
+      "name": "accountId",
+      "in": "path",
+      "required": true,
+      "type": "integer"
+    },
+    "credentialParameter": {
+      "name": "x-BeezUP-Credential",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
+    },
+    "pageNumberQueryStringParameter": {
+      "name": "pageNumber",
+      "description": "The page number you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 1,
+      "x-minimum": 1,
+      "x-example": 1
+    },
+    "pageSizeQueryStringParameter": {
+      "name": "pageSize",
+      "description": "The entry count you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 25,
+      "x-minimum": 25,
+      "x-example": 25
+    },
+    "acceptEncodingRequiredParameter": {
+      "name": "Accept-Encoding",
+      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string"
+    },
+    "ifNoneMatchRequiredParameter": {
+      "name": "If-None-Match",
+      "type": "string",
+      "in": "header",
+      "required": true,
+      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+    },
+    "contentEncodingRequiredParameter": {
+      "name": "Content-Encoding",
+      "description": "The content of the body is compressed to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-example": "gzip"
+    }
+  },
   "responses": {
     "404_OrderChangeId_Not_Found": {
       "description": "Order change not found",
@@ -180,19 +285,19 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/acceptEncodingRequiredParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
           },
           {
-            "$ref": "#/parameters/pageNumberQueryStringParameter"
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/acceptEncodingRequiredParameter"
           },
           {
             "$ref": "#/parameters/pageSizeQueryStringParameter"
           },
           {
-            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+            "$ref": "#/parameters/paginationContinuationTokenQueryStringParameter"
           },
           {
             "name": "orderMarketplaceModificationBeginUtcDate",
@@ -468,16 +573,18 @@
     }
   },
   "definitions": {
+    "paginationContinuationToken": {
+      "type": "string",
+      "description": "Just a string value that will help to get the next page"
+    },
     "getOrderListResponse": {
       "type": "object",
       "required": [
-        "hasNextPage",
         "orders"
       ],
       "properties": {
-        "hasNextPage": {
-          "type": "boolean",
-          "description": "Indicates to the client that there is another page to fetch"
+        "nextPageContinuationToken": {
+          "$ref": "#/definitions/paginationContinuationToken"
         },
         "orders": {
           "type": "array",
@@ -647,6 +754,7 @@
       "default": "notStarted"
     },
     "errorResponseMessage": {
+      "x-exclude": true,
       "type": "object",
       "required": [
         "errors"
@@ -664,12 +772,13 @@
     },
     "docUrl": {
       "type": "string",
-      "format": "uri",
+      "format": "string",
       "description": "The documentation related to this operation.",
       "example": "https://api-docs.beezup.com/#operation/EnableChannelCatalog"
     },
     "userErrorMessage": {
       "type": "object",
+      "x-exclude": true,
       "required": [
         "code",
         "message"
@@ -812,6 +921,7 @@
     },
     "correlationId": {
       "type": "string",
+      "x-exclude": true,
       "description": "The correlation identifier. It's a guid.",
       "format": "guid"
     },
@@ -846,102 +956,5 @@
         "Marketplace Gateway API - Orders - Order Management"
       ]
     }
-  ],
-  "parameters": {
-    "orderChangeIdParameter": {
-      "name": "orderChangeId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "guid"
-    },
-    "marketplaceOrderIdParameter": {
-      "name": "marketplaceOrderId",
-      "description": "The marketplace order identifier",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "MarketplaceOrderId",
-      "x-example": "M1234X10"
-    },
-    "beezUPRequestIdHeaderParameter": {
-      "name": "x-BeezUP-RequestId",
-      "in": "header",
-      "type": "string",
-      "format": "Guid",
-      "required": true,
-      "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
-    },
-    "beezUPCorrelationIdHeaderParameter": {
-      "name": "x-BeezUP-CorrelationId",
-      "in": "header",
-      "type": "string",
-      "format": "Guid",
-      "required": true,
-      "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
-    },
-    "marketplaceBusinessCodeParameter": {
-      "name": "marketplaceBusinessCode",
-      "in": "path",
-      "required": true,
-      "type": "string"
-    },
-    "accountIdParameter": {
-      "name": "accountId",
-      "in": "path",
-      "required": true,
-      "type": "integer"
-    },
-    "credentialParameter": {
-      "name": "x-BeezUP-Credential",
-      "in": "header",
-      "required": true,
-      "type": "string",
-      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
-    },
-    "pageNumberQueryStringParameter": {
-      "name": "pageNumber",
-      "description": "The page number you want to get",
-      "in": "query",
-      "required": true,
-      "type": "integer",
-      "format": "int32",
-      "minimum": 1,
-      "x-minimum": 1,
-      "x-example": 1
-    },
-    "pageSizeQueryStringParameter": {
-      "name": "pageSize",
-      "description": "The entry count you want to get",
-      "in": "query",
-      "required": true,
-      "type": "integer",
-      "format": "int32",
-      "minimum": 25,
-      "x-minimum": 25,
-      "x-example": 25
-    },
-    "acceptEncodingRequiredParameter": {
-      "name": "Accept-Encoding",
-      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
-      "in": "header",
-      "required": true,
-      "type": "string"
-    },
-    "ifNoneMatchRequiredParameter": {
-      "name": "If-None-Match",
-      "type": "string",
-      "in": "header",
-      "required": true,
-      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-    },
-    "contentEncodingRequiredParameter": {
-      "name": "Content-Encoding",
-      "description": "The content of the body is compressed to reduce traffic size.",
-      "in": "header",
-      "required": true,
-      "type": "string",
-      "x-example": "gzip"
-    }
-  }
+  ]
 }

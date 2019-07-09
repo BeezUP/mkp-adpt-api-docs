@@ -30,8 +30,11 @@
     "comment": "First document\n",
     "using": [
       "BeezUP2.Framework.Messaging",
-      "BeezUP2.Framework.Business",
+      "BeezUP2.MKP.Gateway.Schemas",
       "BeezUP2.MKP.Feeds.Schemas",
+      "BeezUP2.MKP.Feeds.Messages"
+    ],
+    "references": [
       "BeezUP2.MKP.Feeds.Messages"
     ],
     "packages": [
@@ -156,6 +159,14 @@
       "required": true,
       "type": "string",
       "format": "guid"
+    },
+    "paginationContinuationTokenQueryStringParameter": {
+      "name": "paginationContinuationToken",
+      "description": "The pagination continuation token you want to get next page.",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "format": "PaginationContinuationToken"
     },
     "orderChangeIdParameter": {
       "name": "orderChangeId",
@@ -297,6 +308,9 @@
         "operationId": "StartFeedPublication",
         "parameters": [
           {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
@@ -304,9 +318,6 @@
           },
           {
             "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
@@ -354,6 +365,9 @@
         "operationId": "PushMerchantFeedMessages",
         "parameters": [
           {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
@@ -361,9 +375,6 @@
           },
           {
             "$ref": "#/parameters/credentialParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
@@ -413,6 +424,9 @@
         "operationId": "CompleteFeedPublication",
         "parameters": [
           {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
@@ -426,9 +440,6 @@
           },
           {
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "name": "request",
@@ -471,6 +482,9 @@
         "summary": "Check the publication status",
         "parameters": [
           {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
@@ -484,9 +498,6 @@
           },
           {
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
           }
         ],
         "responses": {
@@ -524,6 +535,9 @@
         "summary": "Get the publication reporting",
         "parameters": [
           {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
             "$ref": "#/parameters/marketplaceBusinessCodeParameter"
           },
           {
@@ -537,9 +551,6 @@
           },
           {
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/publicationIdParameter"
           },
           {
             "$ref": "#/parameters/acceptEncodingRequiredParameter"
@@ -681,19 +692,19 @@
             "$ref": "#/parameters/credentialParameter"
           },
           {
-            "$ref": "#/parameters/acceptEncodingRequiredParameter"
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
           },
           {
-            "$ref": "#/parameters/pageNumberQueryStringParameter"
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/acceptEncodingRequiredParameter"
           },
           {
             "$ref": "#/parameters/pageSizeQueryStringParameter"
           },
           {
-            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+            "$ref": "#/parameters/paginationContinuationTokenQueryStringParameter"
           },
           {
             "name": "orderMarketplaceModificationBeginUtcDate",
@@ -969,16 +980,18 @@
     }
   },
   "definitions": {
+    "paginationContinuationToken": {
+      "type": "string",
+      "description": "Just a string value that will help to get the next page"
+    },
     "getOrderListResponse": {
       "type": "object",
       "required": [
-        "hasNextPage",
         "orders"
       ],
       "properties": {
-        "hasNextPage": {
-          "type": "boolean",
-          "description": "Indicates to the client that there is another page to fetch"
+        "nextPageContinuationToken": {
+          "$ref": "#/definitions/paginationContinuationToken"
         },
         "orders": {
           "type": "array",
@@ -1356,6 +1369,7 @@
       }
     },
     "errorResponseMessage": {
+      "x-exclude": true,
       "type": "object",
       "required": [
         "errors"
@@ -1373,12 +1387,13 @@
     },
     "docUrl": {
       "type": "string",
-      "format": "uri",
+      "format": "string",
       "description": "The documentation related to this operation.",
       "example": "https://api-docs.beezup.com/#operation/EnableChannelCatalog"
     },
     "userErrorMessage": {
       "type": "object",
+      "x-exclude": true,
       "required": [
         "code",
         "message"
@@ -1521,6 +1536,7 @@
     },
     "correlationId": {
       "type": "string",
+      "x-exclude": true,
       "description": "The correlation identifier. It's a guid.",
       "format": "guid"
     },
