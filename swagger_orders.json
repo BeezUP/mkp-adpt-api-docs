@@ -23,15 +23,21 @@
     "product": "BeezUP",
     "group": "adpt-feedpub",
     "applicationShortName": "MKP.ADPT.Orders.WS",
-    "appRoot": "BZ.MKP.ADPT.Orders.WebService",
-    "namespace": "BZ.MKP.ADPT.Orders.WebService",
+    "appRoot": "BZ.MKP.ADPT.Orders.RestAPI",
+    "namespace": "BZ.MKP.ADPT.Orders.RestAPI",
     "apiName": "MkpGatewayOrdersV1",
     "useBeezUPFrameworkVersion2": true,
     "comment": "First document\n",
     "using": [
       "BeezUP2.Framework.Messaging",
-      "BeezUP2.Framework.Business",
-      "BeezUP2.MKP.Orders.Schemas"
+      "BeezUP2.MKP.Gateway.Schemas",
+      "BeezUP2.MKP.Orders.Schemas",
+      "BeezUP2.MKP.Orders.Messages"
+    ],
+    "references": [
+      "BeezUP2.MKP.Gateway.Schemas",
+      "BeezUP2.MKP.Orders.Messages",
+      "BeezUP2.Framework.Temp"
     ],
     "packages": [
       "BeezUPWebApi"
@@ -67,7 +73,7 @@
       "in": "path",
       "required": true,
       "type": "string",
-      "format": "guid"
+      "format": "OrderChangeId"
     },
     "marketplaceOrderIdParameter": {
       "name": "marketplaceOrderId",
@@ -82,7 +88,7 @@
       "name": "x-BeezUP-RequestId",
       "in": "header",
       "type": "string",
-      "format": "Guid",
+      "format": "RequestId",
       "required": true,
       "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
     },
@@ -90,7 +96,7 @@
       "name": "x-BeezUP-CorrelationId",
       "in": "header",
       "type": "string",
-      "format": "Guid",
+      "format": "CorrelationId",
       "required": true,
       "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
     },
@@ -98,20 +104,24 @@
       "name": "marketplaceBusinessCode",
       "in": "path",
       "required": true,
-      "type": "string"
+      "type": "string",
+      "format": "MarketplaceBusinessCode"
     },
     "accountIdParameter": {
       "name": "accountId",
       "in": "path",
       "required": true,
-      "type": "integer"
+      "type": "integer",
+      "format": "AccountId"
     },
     "credentialParameter": {
       "name": "x-BeezUP-Credential",
       "in": "header",
       "required": true,
+      "x-base64": true,
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64.",
       "type": "string",
-      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64."
+      "x-base64JsonType": "Dictionary<string,string>"
     },
     "pageNumberQueryStringParameter": {
       "name": "pageNumber",
@@ -130,7 +140,7 @@
       "in": "query",
       "required": true,
       "type": "integer",
-      "format": "int32",
+      "format": "PageSize",
       "minimum": 25,
       "x-minimum": 25,
       "x-example": 25
@@ -140,7 +150,8 @@
       "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
       "in": "header",
       "required": true,
-      "type": "string"
+      "type": "string",
+      "x-example": "gzip"
     },
     "ifNoneMatchRequiredParameter": {
       "name": "If-None-Match",
@@ -595,7 +606,12 @@
       }
     },
     "getOrderResponse": {
-      "$ref": "#/definitions/marketplaceOrder"
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/marketplaceOrder"
+        }
+      ]
     },
     "pushOrderChangeMessageRequest": {
       "type": "object",
@@ -753,6 +769,10 @@
       ],
       "default": "notStarted"
     },
+    "orderChangeId": {
+      "type": "string",
+      "description": "The identifier of the order change operation provided by BeezUP"
+    },
     "errorResponseMessage": {
       "x-exclude": true,
       "type": "object",
@@ -771,6 +791,7 @@
       }
     },
     "docUrl": {
+      "x-exclude": true,
       "type": "string",
       "format": "string",
       "description": "The documentation related to this operation.",
@@ -805,26 +826,31 @@
         },
         "arguments": {
           "type": "array",
+          "x-exclude": true,
           "description": "a dictionary string/object",
           "items": {
-            "type": "object",
-            "required": [
-              "name",
-              "value"
-            ],
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "The key of the parameter",
-                "example": "currentCatalogImportationId"
-              },
-              "value": {
-                "type": "object",
-                "description": "The value of the parameter. Depending to the type.",
-                "example": "b24d0dd8-a561-478a-9b26-34f573f03527"
-              }
-            }
+            "$ref": "#/definitions/userErrorMessageArgument"
           }
+        }
+      }
+    },
+    "userErrorMessageArgument": {
+      "type": "object",
+      "x-exclude": true,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The key of the parameter",
+          "example": "currentCatalogImportationId"
+        },
+        "value": {
+          "type": "object",
+          "description": "The value of the parameter. Depending to the type.",
+          "example": "b24d0dd8-a561-478a-9b26-34f573f03527"
         }
       }
     },
@@ -936,6 +962,26 @@
       "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
       "x-pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
       "example": "http://www.mydomain.com"
+    },
+    "marketplaceBusinessCode": {
+      "type": "string",
+      "description": "The marketplace code provided by BeezUP"
+    },
+    "accountId": {
+      "type": "integer",
+      "description": "The account id provided by BeezUP"
+    },
+    "marketplaceProductId": {
+      "type": "string",
+      "description": "The marketplace product identifier provided by the marketplace"
+    },
+    "pageSize": {
+      "type": "integer",
+      "x-exclude": true,
+      "description": "The entity count expected for one page",
+      "minimum": 25,
+      "x-minimum": 25,
+      "x-example": 25
     }
   },
   "externalDocs": {
