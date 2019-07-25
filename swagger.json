@@ -933,6 +933,9 @@
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
           },
+          "404": {
+            "$ref": "#/responses/404_Order_Not_Found"
+          },
           "503": {
             "$ref": "#/responses/503_Marketplace_Down"
           },
