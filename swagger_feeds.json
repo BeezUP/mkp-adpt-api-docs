@@ -145,6 +145,13 @@
       "type": "string",
       "format": "PublicationId"
     },
+    "feedTypeParameter": {
+      "name": "feedType",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "FeedType"
+    },
     "beezUPRequestIdHeaderParameter": {
       "name": "x-BeezUP-RequestId",
       "in": "header",
@@ -265,7 +272,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/start": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/start": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -273,6 +280,9 @@
         "summary": "Start the feed publication",
         "operationId": "StartFeedPublication",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
@@ -290,14 +300,6 @@
           },
           {
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          },
-          {
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/startFeedPublicationRequest"
-            }
           }
         ],
         "responses": {
@@ -322,7 +324,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/publish": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/publish": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -330,6 +332,9 @@
         "summary": "Publish a batch of feeds",
         "operationId": "PublishFeeds",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
@@ -381,7 +386,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/unpublish": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/unpublish": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -389,6 +394,9 @@
         "summary": "Unpublish a batch of feeds",
         "operationId": "UnpublishFeeds",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
@@ -440,7 +448,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/complete": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/complete": {
       "post": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -448,6 +456,9 @@
         "summary": "Complete the feed publication",
         "operationId": "CompleteFeedPublication",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
@@ -497,7 +508,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/status": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/status": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -506,6 +517,9 @@
         "operationId": "CheckPublicationStatus",
         "summary": "Check the publication status",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
@@ -550,7 +564,7 @@
         }
       }
     },
-    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/reporting": {
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{feedType}/{publicationId}/reporting": {
       "get": {
         "tags": [
           "Marketplace Gateway API - Feeds - Publication"
@@ -559,6 +573,9 @@
         "operationId": "GetPublicationReporting",
         "summary": "Get the publication reporting",
         "parameters": [
+          {
+            "$ref": "#/parameters/feedTypeParameter"
+          },
           {
             "$ref": "#/parameters/publicationIdParameter"
           },
