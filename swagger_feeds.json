@@ -862,22 +862,6 @@
         }
       }
     },
-    "feedMetadata": {
-      "type": "object",
-      "required": [
-        "key",
-        "value"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "The marketplace column name"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
     "publishFeed": {
       "allOf": [
         {
@@ -888,14 +872,14 @@
           "required": [
             "sku",
             "messageType",
-            "metadata"
+            "properties"
           ],
           "properties": {
-            "metadata": {
-              "description": "where key is the marketplace column name",
+            "properties": {
+              "description": "where key is the feed property name declared in the BeezUP configuration",
               "type": "array",
               "items": {
-                "$ref": "#/definitions/feedMetadata"
+                "$ref": "#/definitions/metadataProperty"
               }
             }
           }
@@ -1165,6 +1149,24 @@
       "minimum": 25,
       "x-minimum": 25,
       "x-example": 25
+    },
+    "metadataProperty": {
+      "type": "object",
+      "description": "The meta data of a property",
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The property name"
+        },
+        "value": {
+          "type": "string",
+          "description": "The property value"
+        }
+      }
     }
   },
   "externalDocs": {

@@ -30,13 +30,13 @@
     "comment": "First document\n",
     "using": [
       "BeezUP2.Framework.Messaging",
-      "BeezUP2.MKP.Gateway.Schemas",
-      "BeezUP2.MKP.Orders.Schemas",
-      "BeezUP2.MKP.Orders.Messages"
+      "BeezUP2.MKP.ADPT.Schemas",
+      "BeezUP2.MKP.ADPT.Orders.Schemas",
+      "BeezUP2.MKP.ADPT.Orders.Messages"
     ],
     "references": [
-      "BeezUP2.MKP.Gateway.Schemas",
-      "BeezUP2.MKP.Orders.Messages",
+      "BeezUP2.MKP.ADPT.Schemas",
+      "BeezUP2.MKP.ADPT.Orders.Messages",
       "BeezUP2.Framework.Temp"
     ],
     "packages": [
@@ -493,7 +493,14 @@
         ],
         "responses": {
           "202": {
-            "description": "The order change message have been accepted, please check the order change status response."
+            "description": "The order change message have been accepted, please check the order change status response.",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
           },
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
@@ -660,7 +667,10 @@
           "$ref": "#/definitions/beezUPOrderChangeType"
         },
         "parameters": {
-          "$ref": "#/definitions/orderChangeParameters"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metadataProperty"
+          }
         },
         "marketplaceOrderItems": {
           "type": "array",
@@ -715,7 +725,10 @@
           "$ref": "#/definitions/marketplaceOrderETag"
         },
         "properties": {
-          "$ref": "#/definitions/marketplaceOrderProperties"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metadataProperty"
+          }
         },
         "items": {
           "type": "array",
@@ -743,12 +756,6 @@
     "marketplaceOrderETag": {
       "type": "string"
     },
-    "marketplaceOrderProperties": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
     "marketplaceOrderItem": {
       "type": "object",
       "required": [
@@ -759,27 +766,18 @@
           "$ref": "#/definitions/marketplaceOrderItemId"
         },
         "properties": {
-          "$ref": "#/definitions/marketplaceOrderItemProperties"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metadataProperty"
+          }
         }
       }
     },
     "marketplaceOrderItemId": {
       "type": "string"
     },
-    "marketplaceOrderItemProperties": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
     "beezUPOrderChangeType": {
       "type": "string"
-    },
-    "orderChangeParameters": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
     },
     "orderApiOperationName": {
       "type": "string",
@@ -1018,6 +1016,24 @@
       "minimum": 25,
       "x-minimum": 25,
       "x-example": 25
+    },
+    "metadataProperty": {
+      "type": "object",
+      "description": "The meta data of a property",
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The property name"
+        },
+        "value": {
+          "type": "string",
+          "description": "The property value"
+        }
+      }
     }
   },
   "externalDocs": {
