@@ -30,12 +30,12 @@
     "comment": "First document\n",
     "using": [
       "BeezUP2.Framework.Messaging",
-      "BeezUP2.MKP.Gateway.Schemas",
-      "BeezUP2.MKP.Feeds.Messages",
-      "BeezUP2.MKP.Feeds.Schemas"
+      "BeezUP2.MKP.ADPT.Schemas",
+      "BeezUP2.MKP.ADPT.Feeds.Messages",
+      "BeezUP2.MKP.ADPT.Feeds.Schemas"
     ],
     "references": [
-      "BeezUP2.MKP.Feeds.Messages",
+      "BeezUP2.MKP.ADPT.Feeds.Messages",
       "BeezUP2.Framework.Temp"
     ],
     "packages": [
@@ -121,6 +121,13 @@
     },
     "200_HealthCheck": {
       "description": "The health check of the API",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
       "schema": {
         "type": "array",
         "items": {
@@ -130,6 +137,13 @@
     },
     "503_Marketplace_Down": {
       "description": "The marketplace has an invalid response",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
       "schema": {
         "$ref": "#/definitions/errorResponseMessage"
       }
@@ -342,7 +356,14 @@
         ],
         "responses": {
           "204": {
-            "description": "The feed publication has been started!"
+            "description": "The feed publication has been started!",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
           },
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
@@ -401,7 +422,14 @@
         ],
         "responses": {
           "202": {
-            "description": "The feed messages have been registered!"
+            "description": "The feed messages have been registered!",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
           },
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
@@ -460,7 +488,14 @@
         ],
         "responses": {
           "202": {
-            "description": "The feed messages have been registered!"
+            "description": "The feed messages have been registered!",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
           },
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
@@ -517,7 +552,14 @@
         ],
         "responses": {
           "204": {
-            "description": "The feed comands has been completed!"
+            "description": "The feed comands has been completed!",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
           },
           "400": {
             "$ref": "#/responses/400_MBC_Or_Request_Invalid"
@@ -568,6 +610,13 @@
         "responses": {
           "200": {
             "description": "Publication status retrieved",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/checkFeedPublicationStatusResponse"
             }
@@ -631,6 +680,11 @@
                 "x-example": "gzip"
               }
             },
+            "x-MKP-ADPT-ExchangeMessages": {
+              "type": "string",
+              "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+              "format": "ExchangedMessages"
+            },
             "schema": {
               "$ref": "#/definitions/getFeedPublicationReportingResponse"
             }
@@ -678,7 +732,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The exchanged messages are retrieved",
+            "description": "The exchanged messages with marketplace are retrieved",
             "schema": {
               "type": "array",
               "items": {
@@ -816,6 +870,11 @@
                 "description": "The response is zipped to reduce traffic.",
                 "type": "string",
                 "x-example": "gzip"
+              },
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
               }
             },
             "schema": {
@@ -867,6 +926,13 @@
         "responses": {
           "200": {
             "description": "The order is retrieved",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/getOrderResponse"
             }
@@ -979,6 +1045,13 @@
         "responses": {
           "200": {
             "description": "Order change status retrieved",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/orderChangeStatusResponse"
             }
@@ -1031,14 +1104,14 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
+          },
           "404": {
             "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
           },
           "409": {
             "$ref": "#/responses/409_Not_Yet_Available"
-          },
-          "503": {
-            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"

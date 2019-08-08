@@ -204,6 +204,13 @@
     },
     "200_HealthCheck": {
       "description": "The health check of the API",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
       "schema": {
         "type": "array",
         "items": {
@@ -213,6 +220,13 @@
     },
     "503_Marketplace_Down": {
       "description": "The marketplace has an invalid response",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
       "schema": {
         "$ref": "#/definitions/errorResponseMessage"
       }
@@ -355,6 +369,11 @@
                 "description": "The response is zipped to reduce traffic.",
                 "type": "string",
                 "x-example": "gzip"
+              },
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
               }
             },
             "schema": {
@@ -406,6 +425,13 @@
         "responses": {
           "200": {
             "description": "The order is retrieved",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/getOrderResponse"
             }
@@ -518,6 +544,13 @@
         "responses": {
           "200": {
             "description": "Order change status retrieved",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/orderChangeStatusResponse"
             }
@@ -570,14 +603,14 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/responses/400_MBC_Invalid"
+          },
           "404": {
             "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
           },
           "409": {
             "$ref": "#/responses/409_Not_Yet_Available"
-          },
-          "503": {
-            "$ref": "#/responses/503_Marketplace_Down"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
