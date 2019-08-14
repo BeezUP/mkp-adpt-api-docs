@@ -881,10 +881,37 @@
               "items": {
                 "$ref": "#/definitions/metadataProperty"
               }
+            },
+            "children": {
+              "type": "array",
+              "description": "Contains item variations",
+              "items": {
+                "$ref": "#/definitions/publishFeedChild"
+              }
             }
           }
         }
       ]
+    },
+    "publishFeedChild": {
+      "type": "object",
+      "required": [
+        "sku",
+        "properties"
+      ],
+      "description": "Item variation",
+      "properties": {
+        "sku": {
+          "$ref": "#/definitions/sku"
+        },
+        "properties": {
+          "description": "where key is the feed property name declared in the BeezUP configuration",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metadataProperty"
+          }
+        }
+      }
     },
     "unpublishFeed": {
       "allOf": [
