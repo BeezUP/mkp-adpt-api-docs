@@ -257,40 +257,6 @@
     }
   },
   "paths": {
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/health": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Orders - Order Management"
-        ],
-        "summary": "Health check the order management system",
-        "operationId": "HealthCheckGatewayOrderApi",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/200_HealthCheck"
-          },
-          "400": {
-            "$ref": "#/responses/400_MBC_Invalid"
-          },
-          "503": {
-            "description": "The status of your API is down..."
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
     "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/list": {
       "get": {
         "tags": [
@@ -570,54 +536,6 @@
           },
           "503": {
             "$ref": "#/responses/503_Marketplace_Down"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/orders/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPCorrelationId}": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Orders - Order Management"
-        ],
-        "x-tagGroups": "Order Management",
-        "operationId": "GetOrderExchangedMessages",
-        "summary": "Get the order exchanged messages with the marketplace",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "name": "beezUPCorrelationId",
-            "in": "path",
-            "type": "string",
-            "required": true,
-            "format": "CorrelationId"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The exchanged messages are retrieved",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/exchangedMessages"
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/responses/400_MBC_Invalid"
-          },
-          "404": {
-            "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
-          },
-          "409": {
-            "$ref": "#/responses/409_Not_Yet_Available"
           },
           "default": {
             "$ref": "#/responses/GeneralError"
