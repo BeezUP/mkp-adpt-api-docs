@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "BeezUP gateway-orders API",
+    "title": "BeezUP gateway-orders API- DEV",
     "description": "\r\n# The REST API of BeezUP system - Adapter for Order Management\r\n## Overview\r\nThe REST APIs provide programmatic access to read and write BeezUP data. \r\n\r\nThis API have to be implemented by the marketplaces to be able to receive/send data from BeezUP.\r\n\r\n\r\nThe main features are:\r\n- Fetch merchant orders\r\n- Receive merchant order changes\r\n- ...\r\n\r\n\r\n## Things to keep in mind\r\n### Media type\r\nThe default media type for requests and responses is application/json. Where noted, some operations support other content types. If no additional content type is mentioned for a specific operation, then the media type is application/json.\r\n\r\n### Required content type\r\nThe required and default encoding for the request and responses is UTF8.\r\n\r\n### Required date time format\r\nAll our date time are formatted in ISO 8601 format: 2014-06-24T16:25:00Z.\r\n\r\n### Base URL\r\nAll URLs returned by the BeezUP API are relative to this base URL, and all requests to the REST API must use this base URL template.\r\n\r\nYou can test our API on https://beezup.github.io/mkp-adpt-api-docs/swagger-ui\\\\\r\nYou can contact us on [gitter, #BeezUP/API](https://gitter.im/BeezUP/API)\r\n\r\nFeed Management only for code generation: https://beezup.github.io/mkp-adpt-api-docs/swagger_feeds.json\r\nOrder Management only for code generation: https://beezup.github.io/mkp-adpt-api-docs/swagger_orders.json\r\n\r\n",
     "version": "2.0",
     "x-logo": {
@@ -73,7 +73,8 @@
       "in": "path",
       "required": true,
       "type": "string",
-      "format": "OrderChangeId"
+      "format": "OrderChangeId",
+      "description": "Order change identifier which is equivalent to the correlationId"
     },
     "marketplaceOrderIdParameter": {
       "name": "marketplaceOrderId",
@@ -233,6 +234,12 @@
     },
     "400_MBC_Invalid": {
       "description": "The marketplace business code is invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "403_Invalid_Merchant_Credentials": {
+      "description": "The merchant credentials are invalid",
       "schema": {
         "$ref": "#/definitions/errorResponseMessage"
       }
@@ -662,17 +669,21 @@
     },
     "orderPurchaseUtcDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "The purchase date of the order"
     },
     "marketplaceOrderStatus": {
-      "type": "string"
+      "type": "string",
+      "description": "The marketplace order status"
     },
     "marketplaceOrderLastModificationUtcDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "The modification date done by the marketplace"
     },
     "marketplaceOrderETag": {
-      "type": "string"
+      "type": "string",
+      "description": "The ETAG based on the content of the marketplace order. It could based on the marketplace last modification date or the whole content of the order."
     },
     "marketplaceOrderItem": {
       "type": "object",
@@ -695,7 +706,17 @@
       "type": "string"
     },
     "beezUPOrderChangeType": {
-      "type": "string"
+      "type": "string",
+      "description": "The order change type known by BeezUP.",
+      "enum": [
+        "AcceptOrder",
+        "RefuseOrder",
+        "ShipOrder",
+        "CancelOrder",
+        "RefundOrder",
+        "RestockOrder",
+        "PickUpOrder"
+      ]
     },
     "orderApiOperationName": {
       "type": "string",

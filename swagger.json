@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "BeezUP gateway API",
+    "title": "BeezUP gateway API- DEV",
     "description": "\r\n# The REST API of BeezUP system - Adapter\r\n## Overview\r\nThe REST APIs provide programmatic access to read and write BeezUP data. \r\n\r\nThis API have to be implemented by the marketplaces to be able to receive/send data from BeezUP.\r\n\r\n\r\nThe main features are:\r\n- Receive merchant feeds (products and offers)\r\n- Fetch merchant orders\r\n- Receive merchant order changes\r\n- ...\r\n\r\n\r\n## Things to keep in mind\r\n### Media type\r\nThe default media type for requests and responses is application/json. Where noted, some operations support other content types. If no additional content type is mentioned for a specific operation, then the media type is application/json.\r\n\r\n### Required content type\r\nThe required and default encoding for the request and responses is UTF8.\r\n\r\n### Required date time format\r\nAll our date time are formatted in ISO 8601 format: 2014-06-24T16:25:00Z.\r\n\r\n### Base URL\r\nAll URLs returned by the BeezUP API are relative to this base URL, and all requests to the REST API must use this base URL template.\r\n\r\nYou can test our API on https://beezup.github.io/mkp-adpt-api-docs/swagger-ui\\\\\r\nYou can contact us on [gitter, #BeezUP/API](https://gitter.im/BeezUP/API)\r\n\r\n",
     "version": "2.0",
     "x-logo": {
@@ -21,26 +21,27 @@
     "codeGenType": "webapi",
     "repo": "BeezUP",
     "product": "BeezUP",
-    "group": "adpt-platform",
-    "applicationShortName": "MKP.ADPT.Platform.WS",
-    "appRoot": "BZ.MKP.ADPT.Platform.RestAPI",
-    "namespace": "BZ.MKP.ADPT.Platform.RestAPI",
-    "apiName": "MkpGatewayPlatformV1",
+    "group": "adpt-feedpub",
+    "applicationShortName": "MKP.ADPT.Feeds.WS",
+    "appRoot": "BZ.MKP.ADPT.Feeds.RestAPI",
+    "namespace": "BZ.MKP.ADPT.Feeds.RestAPI",
+    "apiName": "MkpGatewayFeedsV1",
     "useBeezUPFrameworkVersion2": true,
     "comment": "First document\n",
     "using": [
-      "BeezUP2.Framework.Messaging",
-      "BeezUP2.MKP.ADPT.Schemas"
+      "BeezUP2.MKP.ADPT.Schemas",
+      "BeezUP2.MKP.ADPT.Feeds.Messages",
+      "BeezUP2.MKP.ADPT.Feeds.Schemas"
     ],
     "references": [
-      "BeezUP2.MKP.ADPT.Schemas",
+      "BeezUP2.MKP.ADPT.Feeds.Messages",
       "BeezUP2.Framework.Temp"
     ],
     "packages": [
       "BeezUPWebApi"
     ]
   },
-  "x-basePath": "/marketplace/platform/v1",
+  "x-basePath": "/marketplace/feeds/v1",
   "schemes": [
     "https"
   ],
@@ -52,10 +53,6 @@
   ],
   "tags": [
     {
-      "name": "Marketplace Gateway API - Platform - Platform",
-      "x-displayName": "Platform"
-    },
-    {
       "name": "Marketplace Gateway API - Feeds - Publication",
       "x-displayName": "Publication"
     },
@@ -64,93 +61,236 @@
       "x-displayName": "Order Management"
     }
   ],
+  "responses": {
+    "404_Publication_NotFound": {
+      "description": "The combination of MarketplaceBusinessCode, AccountId and publication id is not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "400_MBC_Invalid": {
+      "description": "The marketplace business code is invalid is invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "409_Publication_Already_Completed": {
+      "description": "The publication id is already completed",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "409_Publication_Already_Exists": {
+      "description": "The publication id  already exists",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "404_OrderChangeId_Not_Found": {
+      "description": "Order change not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "404_Order_Not_Found": {
+      "description": "Order not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "GeneralError": {
+      "description": "Occurs when something goes wrong",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "304_NotModified": {
+      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
+      "headers": {
+        "Last-Modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
+        },
+        "ETag": {
+          "type": "string",
+          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "200_HealthCheck": {
+      "description": "The health check of the API",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/healthCheck"
+        }
+      }
+    },
+    "503_Marketplace_Down": {
+      "description": "The marketplace has an invalid response",
+      "headers": {
+        "x-MKP-ADPT-ExchangeMessages": {
+          "type": "string",
+          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+          "format": "ExchangedMessages"
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "403_Invalid_Merchant_Credentials": {
+      "description": "The merchant credentials are invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "400_MBC_Or_Request_Invalid": {
+      "description": "The marketplace business code is invalid or the request is invalid",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "409_Not_Yet_Available": {
+      "description": "Resource not yet available",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "404_BeezUP_TraceId_NotFound": {
+      "description": "BeezUP Trace Id is not found",
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    }
+  },
+  "parameters": {
+    "publicationIdParameter": {
+      "name": "publicationId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "PublicationId"
+    },
+    "paginationContinuationTokenQueryStringParameter": {
+      "name": "paginationContinuationToken",
+      "description": "The pagination continuation token you want to get next page.",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "format": "PaginationContinuationToken"
+    },
+    "orderChangeIdParameter": {
+      "name": "orderChangeId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "OrderChangeId",
+      "description": "Order change identifier which is equivalent to the correlationId"
+    },
+    "marketplaceOrderIdParameter": {
+      "name": "marketplaceOrderId",
+      "description": "The marketplace order identifier",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MarketplaceOrderId",
+      "x-example": "M1234X10"
+    },
+    "beezUPRequestIdHeaderParameter": {
+      "name": "x-BeezUP-RequestId",
+      "in": "header",
+      "type": "string",
+      "format": "RequestId",
+      "required": true,
+      "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
+    },
+    "beezUPCorrelationIdHeaderParameter": {
+      "name": "x-BeezUP-CorrelationId",
+      "in": "header",
+      "type": "string",
+      "format": "CorrelationId",
+      "required": true,
+      "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
+    },
+    "marketplaceBusinessCodeParameter": {
+      "name": "marketplaceBusinessCode",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MarketplaceBusinessCode"
+    },
+    "accountIdParameter": {
+      "name": "accountId",
+      "in": "path",
+      "required": true,
+      "type": "integer",
+      "format": "AccountId"
+    },
+    "credentialParameter": {
+      "name": "x-BeezUP-Credential",
+      "in": "header",
+      "required": true,
+      "x-base64": true,
+      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64.",
+      "type": "string",
+      "x-base64JsonType": "Dictionary<string,string>"
+    },
+    "pageNumberQueryStringParameter": {
+      "name": "pageNumber",
+      "description": "The page number you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "int32",
+      "minimum": 1,
+      "x-minimum": 1,
+      "x-example": 1
+    },
+    "pageSizeQueryStringParameter": {
+      "name": "pageSize",
+      "description": "The entry count you want to get",
+      "in": "query",
+      "required": true,
+      "type": "integer",
+      "format": "PageSize",
+      "minimum": 25,
+      "x-minimum": 25,
+      "x-example": 25
+    },
+    "acceptEncodingRequiredParameter": {
+      "name": "Accept-Encoding",
+      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-example": "gzip"
+    },
+    "ifNoneMatchRequiredParameter": {
+      "name": "If-None-Match",
+      "type": "string",
+      "in": "header",
+      "required": true,
+      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+    },
+    "contentEncodingRequiredParameter": {
+      "name": "Content-Encoding",
+      "description": "The content of the body is compressed to reduce traffic size.",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "x-example": "gzip"
+    }
+  },
   "paths": {
-    "/marketplace/platform/v1/{marketplaceBusinessCode}/{accountId}/health": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Platform - Platform"
-        ],
-        "x-tagGroups": "Platform",
-        "summary": "Health check the marketplace system",
-        "operationId": "HealthCheckGateway",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
-          },
-          {
-            "$ref": "#/parameters/credentialParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/200_HealthCheck"
-          },
-          "400": {
-            "$ref": "#/responses/400_MBC_Invalid"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
-    "/marketplace/platform/v1/{marketplaceBusinessCode}/{accountId}/exchangedMessages/{beezUPCorrelationId}": {
-      "get": {
-        "tags": [
-          "Marketplace Gateway API - Platform - Platform"
-        ],
-        "x-tagGroups": "Platform",
-        "operationId": "GetExchangedMessages",
-        "summary": "Get the exchanged messages with the marketplace",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
-          },
-          {
-            "$ref": "#/parameters/accountIdParameter"
-          },
-          {
-            "name": "beezUPCorrelationId",
-            "in": "path",
-            "type": "string",
-            "required": true,
-            "format": "CorrelationId"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The exchanged messages are retrieved",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/exchangedMessages"
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/responses/400_MBC_Invalid"
-          },
-          "404": {
-            "$ref": "#/responses/404_BeezUP_TraceId_NotFound"
-          },
-          "409": {
-            "$ref": "#/responses/409_Not_Yet_Available"
-          },
-          "default": {
-            "$ref": "#/responses/GeneralError"
-          }
-        }
-      }
-    },
     "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/start": {
       "post": {
         "tags": [
@@ -944,17 +1084,21 @@
     },
     "orderPurchaseUtcDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "The purchase date of the order"
     },
     "marketplaceOrderStatus": {
-      "type": "string"
+      "type": "string",
+      "description": "The marketplace order status"
     },
     "marketplaceOrderLastModificationUtcDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "The modification date done by the marketplace"
     },
     "marketplaceOrderETag": {
-      "type": "string"
+      "type": "string",
+      "description": "The ETAG based on the content of the marketplace order. It could based on the marketplace last modification date or the whole content of the order."
     },
     "marketplaceOrderItem": {
       "type": "object",
@@ -977,7 +1121,17 @@
       "type": "string"
     },
     "beezUPOrderChangeType": {
-      "type": "string"
+      "type": "string",
+      "description": "The order change type known by BeezUP.",
+      "enum": [
+        "AcceptOrder",
+        "RefuseOrder",
+        "ShipOrder",
+        "CancelOrder",
+        "RefundOrder",
+        "RestockOrder",
+        "PickUpOrder"
+      ]
     },
     "orderApiOperationName": {
       "type": "string",
@@ -1477,12 +1631,6 @@
   },
   "x-tagGroups": [
     {
-      "name": "Marketplace Gateway API - Platform",
-      "tags": [
-        "Marketplace Gateway API - Platform - Platform"
-      ]
-    },
-    {
       "name": "Marketplace Gateway API - Feeds",
       "tags": [
         "Marketplace Gateway API - Feeds - Publication"
@@ -1494,227 +1642,5 @@
         "Marketplace Gateway API - Orders - Order Management"
       ]
     }
-  ],
-  "parameters": {
-    "publicationIdParameter": {
-      "name": "publicationId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "PublicationId"
-    },
-    "paginationContinuationTokenQueryStringParameter": {
-      "name": "paginationContinuationToken",
-      "description": "The pagination continuation token you want to get next page.",
-      "in": "query",
-      "required": false,
-      "type": "string",
-      "format": "PaginationContinuationToken"
-    },
-    "orderChangeIdParameter": {
-      "name": "orderChangeId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "OrderChangeId"
-    },
-    "marketplaceOrderIdParameter": {
-      "name": "marketplaceOrderId",
-      "description": "The marketplace order identifier",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "MarketplaceOrderId",
-      "x-example": "M1234X10"
-    },
-    "beezUPRequestIdHeaderParameter": {
-      "name": "x-BeezUP-RequestId",
-      "in": "header",
-      "type": "string",
-      "format": "RequestId",
-      "required": true,
-      "description": "Indicates to the server the BeezUP request id related to this call. All traces must use this id to be able to follow it."
-    },
-    "beezUPCorrelationIdHeaderParameter": {
-      "name": "x-BeezUP-CorrelationId",
-      "in": "header",
-      "type": "string",
-      "format": "CorrelationId",
-      "required": true,
-      "description": "Indicates to the server the BeezUP correlation id related to this call. All traces must use this id to be able to follow it."
-    },
-    "marketplaceBusinessCodeParameter": {
-      "name": "marketplaceBusinessCode",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "format": "MarketplaceBusinessCode"
-    },
-    "accountIdParameter": {
-      "name": "accountId",
-      "in": "path",
-      "required": true,
-      "type": "integer",
-      "format": "AccountId"
-    },
-    "credentialParameter": {
-      "name": "x-BeezUP-Credential",
-      "in": "header",
-      "required": true,
-      "x-base64": true,
-      "description": "It's the merchant configuration related to the marketplace, serialiazed in json in base64.",
-      "type": "string",
-      "x-base64JsonType": "Dictionary<string,string>"
-    },
-    "pageNumberQueryStringParameter": {
-      "name": "pageNumber",
-      "description": "The page number you want to get",
-      "in": "query",
-      "required": true,
-      "type": "integer",
-      "format": "int32",
-      "minimum": 1,
-      "x-minimum": 1,
-      "x-example": 1
-    },
-    "pageSizeQueryStringParameter": {
-      "name": "pageSize",
-      "description": "The entry count you want to get",
-      "in": "query",
-      "required": true,
-      "type": "integer",
-      "format": "PageSize",
-      "minimum": 25,
-      "x-minimum": 25,
-      "x-example": 25
-    },
-    "acceptEncodingRequiredParameter": {
-      "name": "Accept-Encoding",
-      "description": "Allows the client to indicate wether it accepts a compressed encoding to reduce traffic size.",
-      "in": "header",
-      "required": true,
-      "type": "string",
-      "x-example": "gzip"
-    },
-    "ifNoneMatchRequiredParameter": {
-      "name": "If-None-Match",
-      "type": "string",
-      "in": "header",
-      "required": true,
-      "description": "ETag value to identify the last known version of requested resource.\\\nTo avoid useless exchange, we recommend you to indicate the ETag you previously got from this operation.\\\nIf the ETag value does not match the response will be 200 to give you a new content, otherwise the response will be: 304 Not Modified, without any content.\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-    },
-    "contentEncodingRequiredParameter": {
-      "name": "Content-Encoding",
-      "description": "The content of the body is compressed to reduce traffic size.",
-      "in": "header",
-      "required": true,
-      "type": "string",
-      "x-example": "gzip"
-    }
-  },
-  "responses": {
-    "404_Publication_NotFound": {
-      "description": "The combination of MarketplaceBusinessCode, AccountId and publication id is not found",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "400_MBC_Invalid": {
-      "description": "The marketplace business code is invalid is invalid",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "409_Publication_Already_Completed": {
-      "description": "The publication id is already completed",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "409_Publication_Already_Exists": {
-      "description": "The publication id  already exists",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "404_OrderChangeId_Not_Found": {
-      "description": "Order change not found",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "404_Order_Not_Found": {
-      "description": "Order not found",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "GeneralError": {
-      "description": "Occurs when something goes wrong",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "304_NotModified": {
-      "description": "The ETag sent in the http header If-None-Match did not change. So you are up to date !",
-      "headers": {
-        "Last-Modified": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Last modification UTC date of the resource\\\nFor more details go to this link: https://tools.ietf.org/html/rfc7232#section-2.2\n"
-        },
-        "ETag": {
-          "type": "string",
-          "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
-        }
-      }
-    },
-    "200_HealthCheck": {
-      "description": "The health check of the API",
-      "headers": {
-        "x-MKP-ADPT-ExchangeMessages": {
-          "type": "string",
-          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
-          "format": "ExchangedMessages"
-        }
-      },
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/healthCheck"
-        }
-      }
-    },
-    "503_Marketplace_Down": {
-      "description": "The marketplace has an invalid response",
-      "headers": {
-        "x-MKP-ADPT-ExchangeMessages": {
-          "type": "string",
-          "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
-          "format": "ExchangedMessages"
-        }
-      },
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "400_MBC_Or_Request_Invalid": {
-      "description": "The marketplace business code is invalid or the request is invalid",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "409_Not_Yet_Available": {
-      "description": "Resource not yet available",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    },
-    "404_BeezUP_TraceId_NotFound": {
-      "description": "BeezUP Trace Id is not found",
-      "schema": {
-        "$ref": "#/definitions/errorResponseMessage"
-      }
-    }
-  }
+  ]
 }
