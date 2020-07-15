@@ -16,7 +16,7 @@
       "url": "https://www.beezup.com/"
     }
   },
-  "host": "api.beezup.com",
+  "host": "mkpapigateway.beezup.com",
   "basePath": "",
   "schemes": [
     "https"
@@ -104,11 +104,25 @@
             "type": "string",
             "required": true,
             "format": "CorrelationId"
+          },
+          {
+            "name": "X-ContinuationToken",
+            "in": "header",
+            "type": "string",
+            "required": false,
+            "description": "If the X-ContinuationToken in response is fulfilled, you can have the next page using this parameter",
+            "x-base64": "true"
           }
         ],
         "responses": {
           "200": {
             "description": "The exchanged messages are retrieved",
+            "headers": {
+              "X-NextContinuationToken": {
+                "type": "string",
+                "description": "If there is more result for this query, the next continuation token will be fulffiled"
+              }
+            },
             "schema": {
               "type": "array",
               "items": {
@@ -895,9 +909,7 @@
       "required": [
         "marketplaceOperationName",
         "requestUri",
-        "responseUri",
-        "requestUtcDate",
-        "responseUtcDate"
+        "requestUtcDate"
       ],
       "properties": {
         "marketplaceOperationName": {
@@ -1255,6 +1267,7 @@
       "default": "error"
     },
     "getOrderListResponse": {
+      "x-format": "Message",
       "type": "object",
       "required": [
         "orders"
@@ -1272,6 +1285,7 @@
       }
     },
     "getOrderResponse": {
+      "x-format": "Message",
       "type": "object",
       "allOf": [
         {
@@ -1280,6 +1294,7 @@
       ]
     },
     "pushOrderChangeMessageRequest": {
+      "x-format": "Message",
       "type": "object",
       "required": [
         "beezUPOrderChangeType",
@@ -1304,6 +1319,7 @@
       }
     },
     "orderChangeStatusResponse": {
+      "x-format": "Message",
       "type": "object",
       "required": [
         "beezUPOrderChangeStatus"
