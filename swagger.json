@@ -1174,7 +1174,8 @@
       "enum": [
         "inProgress",
         "done",
-        "failed"
+        "failed",
+        "notStarted"
       ],
       "default": "notStarted"
     },
