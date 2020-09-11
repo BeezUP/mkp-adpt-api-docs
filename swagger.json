@@ -891,7 +891,7 @@
       "properties": {
         "errors": {
           "type": "array",
-          "uniqueItems": "false",
+          "uniqueItems": false,
           "minLength": "1",
           "items": {
             "$ref": "#/definitions/userErrorMessage"
