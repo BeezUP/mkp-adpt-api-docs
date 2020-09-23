@@ -245,16 +245,10 @@
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
-            "$ref": "#/parameters/contentEncodingRequiredParameter"
-          },
-          {
             "name": "request",
             "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "type": "string"
             }
           }
         ],
