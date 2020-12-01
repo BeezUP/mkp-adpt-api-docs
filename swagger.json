@@ -221,9 +221,6 @@
           "Marketplace Gateway API - Feeds - Publication"
         ],
         "summary": "Publish the feeds file",
-        "consumes": [
-          "text/uri-list"
-        ],
         "operationId": "PublishFeedsFile",
         "parameters": [
           {
@@ -245,8 +242,9 @@
             "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
           },
           {
-            "name": "request",
+            "name": "feedFileUrl",
             "in": "body",
+            "description": "The uri of the file to process",
             "schema": {
               "type": "string"
             }
@@ -387,6 +385,73 @@
             "in": "body",
             "schema": {
               "$ref": "#/definitions/unpublishFeedsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The feed messages have been registered!",
+            "headers": {
+              "x-MKP-ADPT-ExchangeMessages": {
+                "type": "string",
+                "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
+                "format": "ExchangedMessages"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400_MBC_Or_Request_Invalid"
+          },
+          "401": {
+            "$ref": "#/responses/403_Invalid_Merchant_Credentials"
+          },
+          "404": {
+            "$ref": "#/responses/404_Publication_NotFound"
+          },
+          "409": {
+            "$ref": "#/responses/409_Publication_Already_Completed"
+          },
+          "503": {
+            "$ref": "#/responses/503_Marketplace_Down"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/marketplace/feeds/v1/{marketplaceBusinessCode}/{accountId}/publications/{publicationId}/unpublishFile": {
+      "post": {
+        "tags": [
+          "Marketplace Gateway API - Feeds - Publication"
+        ],
+        "summary": "Unpublish the feeds file",
+        "operationId": "UnpublishFeedsFile",
+        "parameters": [
+          {
+            "$ref": "#/parameters/publicationIdParameter"
+          },
+          {
+            "$ref": "#/parameters/marketplaceBusinessCodeParameter"
+          },
+          {
+            "$ref": "#/parameters/accountIdParameter"
+          },
+          {
+            "$ref": "#/parameters/credentialParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPRequestIdHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/beezUPCorrelationIdHeaderParameter"
+          },
+          {
+            "name": "feedFileUrl",
+            "in": "body",
+            "description": "The uri of the file to process",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1195,11 +1260,7 @@
       }
     },
     "feedType": {
-      "type": "string",
-      "enum": [
-        "products",
-        "offers"
-      ]
+      "type": "string"
     },
     "publishFeed": {
       "type": "object",
