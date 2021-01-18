@@ -17,7 +17,6 @@
     }
   },
   "host": "mkpapigateway.beezup.com",
-  "basePath": "",
   "schemes": [
     "https"
   ],
