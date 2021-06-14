@@ -1320,7 +1320,7 @@
         "message"
       ],
       "properties": {
-        "type": {
+        "reportingType": {
           "$ref": "#/definitions/reportingType"
         },
         "code": {
