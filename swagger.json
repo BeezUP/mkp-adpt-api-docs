@@ -1294,11 +1294,20 @@
     "unpublishFeed": {
       "type": "object",
       "required": [
-        "sku"
+        "sku",
+        "properties"
       ],
+      "description": "Item variation",
       "properties": {
         "sku": {
           "$ref": "#/definitions/sku"
+        },
+        "properties": {
+          "description": "where key is the feed property name declared in the BeezUP configuration",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metadataProperty"
+          }
         }
       }
     },
