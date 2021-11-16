@@ -38,6 +38,10 @@
     {
       "name": "Marketplace Gateway API - Orders - Order Management",
       "x-displayName": "Order Management"
+    },
+    {
+      "name": "Conversation ADPT RestAPI - Conversation",
+      "x-displayName": "Conversation"
     }
   ],
   "paths": {
@@ -2922,6 +2926,12 @@
       "name": "Marketplace Gateway API - Orders",
       "tags": [
         "Marketplace Gateway API - Orders - Order Management"
+      ]
+    },
+    {
+      "name": "Conversation ADPT RestAPI",
+      "tags": [
+        "Conversation ADPT RestAPI - Conversation"
       ]
     }
   ],
