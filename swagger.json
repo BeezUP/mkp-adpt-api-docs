@@ -1147,7 +1147,7 @@
         "tags": [
           "Conversation ADPT RestAPI - Conversation"
         ],
-        "summary": "Subscribe to discussions",
+        "summary": "Get discussions",
         "operationId": "GetDiscussions",
         "parameters": [
           {
@@ -1218,7 +1218,7 @@
         "tags": [
           "Conversation ADPT RestAPI - Conversation"
         ],
-        "summary": "Subscribe to discussions",
+        "summary": "Get one discussion",
         "operationId": "GetDiscussionMessages",
         "parameters": [
           {
@@ -1372,7 +1372,7 @@
         }
       }
     },
-    "/gateway/conversations/v1/getAllLastSynchronization": {
+    "/gateway/conversations/v1/lastSynchronizations": {
       "get": {
         "x-basePathSlashOnly": "true",
         "tags": [
@@ -1382,11 +1382,11 @@
         "operationId": "GetAllLastSynchronization",
         "responses": {
           "200": {
-            "description": "Synchronization Information",
+            "description": "Last synchronization information list",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/AccountLastSynchronizationUtcDate"
+                "$ref": "#/definitions/accountLastSynchronization"
               }
             }
           },
@@ -1400,10 +1400,8 @@
             "$ref": "#/responses/GeneralError"
           }
         }
-      }
-    },
-    "/gateway/conversations/v1/GetAccountsLastSynchronization": {
-      "get": {
+      },
+      "post": {
         "x-basePathSlashOnly": "true",
         "tags": [
           "Conversation ADPT RestAPI - Conversation"
@@ -1419,18 +1417,18 @@
               "type": "array",
               "minItems": 1,
               "items": {
-                "$ref": "#/definitions/merchantId"
+                "$ref": "#/definitions/channelCodeMerchantId"
               }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Synchronization Information",
+            "description": "Last synchronization information list",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/AccountLastSynchronizationUtcDate"
+                "$ref": "#/definitions/accountLastSynchronization"
               }
             }
           },
@@ -2250,9 +2248,16 @@
         }
       }
     },
-    "AccountLastSynchronizationUtcDate": {
+    "accountLastSynchronization": {
       "type": "object",
+      "required": [
+        "channelCode",
+        "merchantId"
+      ],
       "properties": {
+        "channelCode": {
+          "$ref": "#/definitions/channelCode"
+        },
         "merchantId": {
           "$ref": "#/definitions/merchantId"
         },
@@ -2262,13 +2267,20 @@
         }
       }
     },
-    "merchantId": {
-      "type": "string",
-      "description": "The merchant identifier",
-      "pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
-      "x-pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
-      "x-maxLength": "20",
-      "x-minLength": "1"
+    "channelCodeMerchantId": {
+      "type": "object",
+      "required": [
+        "channelCode",
+        "merchantId"
+      ],
+      "properties": {
+        "channelCode": {
+          "$ref": "#/definitions/conversationChannelCode"
+        },
+        "merchantId": {
+          "$ref": "#/definitions/merchantId"
+        }
+      }
     },
     "channelDiscussionId": {
       "description": "The channel discussion identifier",
@@ -2501,6 +2513,22 @@
           }
         }
       }
+    },
+    "merchantId": {
+      "type": "string",
+      "description": "The merchant identifier",
+      "pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-maxLength": "20",
+      "x-minLength": "1"
+    },
+    "conversationChannelCode": {
+      "description": "The conversation channel code",
+      "type": "string",
+      "pattern": "^([A-Z0-9]){2,26}$",
+      "x-pattern": "^([A-Z0-9]){2,26}$",
+      "x-maxLength": "26",
+      "x-minLength": "2"
     },
     "discussionEntityType": {
       "description": "The discussion entity type",
