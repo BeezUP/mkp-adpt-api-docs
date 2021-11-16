@@ -2256,7 +2256,7 @@
       ],
       "properties": {
         "channelCode": {
-          "$ref": "#/definitions/channelCode"
+          "$ref": "#/definitions/conversationChannelCode"
         },
         "merchantId": {
           "$ref": "#/definitions/merchantId"
@@ -2514,14 +2514,6 @@
         }
       }
     },
-    "merchantId": {
-      "type": "string",
-      "description": "The merchant identifier",
-      "pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
-      "x-pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
-      "x-maxLength": "20",
-      "x-minLength": "1"
-    },
     "conversationChannelCode": {
       "description": "The conversation channel code",
       "type": "string",
@@ -2529,6 +2521,14 @@
       "x-pattern": "^([A-Z0-9]){2,26}$",
       "x-maxLength": "26",
       "x-minLength": "2"
+    },
+    "merchantId": {
+      "type": "string",
+      "description": "The merchant identifier",
+      "pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-maxLength": "20",
+      "x-minLength": "1"
     },
     "discussionEntityType": {
       "description": "The discussion entity type",
