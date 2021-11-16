@@ -973,6 +973,474 @@
           }
         }
       }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/subscribe": {
+      "post": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Subscribe to discussions",
+        "operationId": "SubscribeDiscussions",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Subscription accepted"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/unsubscribe": {
+      "post": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Unsubscribe to discussions",
+        "operationId": "UnsubscribeDiscussions",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Unsubscription accepted"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/harvest": {
+      "post": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Harvest discussions for an account",
+        "operationId": "HarvestAccountDiscussions",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "required": false,
+            "description": "If used it will force the harvest since this date"
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "type": "boolean",
+            "required": false
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Harvest request accepted"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/harvest/{channelDiscussionId}": {
+      "post": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Harvest one discussion",
+        "operationId": "HarvestOneDiscussion",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelDiscussionIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Harvest request accepted"
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/discussions": {
+      "get": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Subscribe to discussions",
+        "operationId": "GetDiscussions",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          },
+          {
+            "name": "X-PageContinuationToken",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "format": "PageContinuationToken"
+          },
+          {
+            "name": "lastSynchronizationUtcDate",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "lastSynchronizedChannelDiscussionId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "ChannelDiscussionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The discussion list",
+            "headers": {
+              "X-NextPageContinuationToken": {
+                "type": "string",
+                "format": "PageContinuationToken"
+              }
+            },
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/getDiscussionResponse"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/discussions/{channelDiscussionId}": {
+      "get": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Subscribe to discussions",
+        "operationId": "GetDiscussionMessages",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelDiscussionIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The discussion message list",
+            "schema": {
+              "$ref": "#/definitions/getDiscussionResponse"
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "404": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/sendMessages": {
+      "post": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Send discussion messages on the channel",
+        "operationId": "SendDiscussionMessages",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/sendDiscussionMessageRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The discussion messages sent",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/createDiscussionMessageResponse"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/{conversationChannelCode}/{merchantId}/createDiscussions": {
+      "post": {
+        "x-release": "PLANNED",
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "Create discussions on the channel",
+        "operationId": "CreateDiscussions",
+        "parameters": [
+          {
+            "$ref": "#/parameters/conversationChannelCodePathParameter"
+          },
+          {
+            "$ref": "#/parameters/merchantIdPathParameter"
+          },
+          {
+            "$ref": "#/parameters/channelConfigHeaderParameter"
+          },
+          {
+            "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/createDiscussionRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Discussions created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/createDiscussionResponse"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/getAllLastSynchronization": {
+      "get": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "GetAllLastSynchronization",
+        "operationId": "GetAllLastSynchronization",
+        "responses": {
+          "200": {
+            "description": "Synchronization Information",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AccountLastSynchronizationUtcDate"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
+    },
+    "/gateway/conversations/v1/GetAccountsLastSynchronization": {
+      "get": {
+        "x-basePathSlashOnly": "true",
+        "tags": [
+          "Conversation ADPT RestAPI - Conversation"
+        ],
+        "summary": "GetAccountsLastSynchronization",
+        "operationId": "GetAccountsLastSynchronization",
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/merchantId"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Synchronization Information",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AccountLastSynchronizationUtcDate"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/GeneralError"
+          },
+          "429": {
+            "$ref": "#/responses/429_TooManyRequests"
+          },
+          "default": {
+            "$ref": "#/responses/GeneralError"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1591,6 +2059,591 @@
     },
     "marketplaceOrderItemId": {
       "type": "string"
+    },
+    "getDiscussionResponse": {
+      "type": "object",
+      "required": [
+        "channelCreationUtcDate"
+      ],
+      "properties": {
+        "channelDiscussionId": {
+          "$ref": "#/definitions/channelDiscussionId"
+        },
+        "subject": {
+          "$ref": "#/definitions/discussionSubject"
+        },
+        "status": {
+          "$ref": "#/definitions/discussionStatus"
+        },
+        "type": {
+          "$ref": "#/definitions/discussionType"
+        },
+        "subType": {
+          "$ref": "#/definitions/discussionSubType"
+        },
+        "isTest": {
+          "type": "boolean"
+        },
+        "relatedEntities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/getDiscussionEntityResponse"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/getDiscussionMessageResponse"
+          }
+        },
+        "channelCreationUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "sendDiscussionMessageRequest": {
+      "type": "object",
+      "required": [
+        "channelDiscussionId",
+        "discussionId",
+        "discussionMessageId",
+        "body",
+        "subject",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "channelDiscussionId": {
+          "$ref": "#/definitions/channelDiscussionId"
+        },
+        "discussionId": {
+          "$ref": "#/definitions/discussionId"
+        },
+        "discussionMessageId": {
+          "$ref": "#/definitions/discussionMessageId"
+        },
+        "body": {
+          "$ref": "#/definitions/discussionMessageBody"
+        },
+        "subject": {
+          "$ref": "#/definitions/discussionSubject"
+        },
+        "from": {
+          "$ref": "#/definitions/createDiscussionMessageParticipantRequest"
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/createDiscussionMessageParticipantRequest"
+          }
+        },
+        "isTest": {
+          "type": "boolean",
+          "description": "If true, the message will be sent to the channel test environment or it will be only kept inside the system not sent to anyone"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/createDiscussionMessageAttachmentRequest"
+          }
+        },
+        "replyToChannelDiscussionMessageId": {
+          "$ref": "#/definitions/channelDiscussionMessageId"
+        }
+      }
+    },
+    "createDiscussionMessageResponse": {
+      "type": "object",
+      "required": [
+        "discussionId",
+        "discussionMessageId",
+        "success"
+      ],
+      "properties": {
+        "discussionId": {
+          "$ref": "#/definitions/discussionId"
+        },
+        "discussionMessageId": {
+          "$ref": "#/definitions/discussionMessageId"
+        },
+        "channelDiscussionId": {
+          "$ref": "#/definitions/channelDiscussionId"
+        },
+        "channelDiscussionMessageId": {
+          "$ref": "#/definitions/channelDiscussionMessageId"
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "createDiscussionRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "subject"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/discussionId"
+        },
+        "subject": {
+          "$ref": "#/definitions/discussionSubject"
+        },
+        "status": {
+          "$ref": "#/definitions/discussionStatus"
+        },
+        "type": {
+          "$ref": "#/definitions/discussionType"
+        },
+        "subType": {
+          "$ref": "#/definitions/discussionSubType"
+        },
+        "isTest": {
+          "type": "boolean"
+        },
+        "relatedEntities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/createDiscussionEntityRequest"
+          }
+        },
+        "message": {
+          "$ref": "#/definitions/createDiscussionMessageRequest"
+        }
+      }
+    },
+    "createDiscussionResponse": {
+      "type": "object",
+      "required": [
+        "discussionId",
+        "discussionMessageId",
+        "success"
+      ],
+      "properties": {
+        "discussionId": {
+          "$ref": "#/definitions/discussionId"
+        },
+        "discussionMessageId": {
+          "$ref": "#/definitions/discussionMessageId"
+        },
+        "channelDiscussionId": {
+          "$ref": "#/definitions/channelDiscussionId"
+        },
+        "channelDiscussionMessageId": {
+          "$ref": "#/definitions/channelDiscussionMessageId"
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "AccountLastSynchronizationUtcDate": {
+      "type": "object",
+      "properties": {
+        "merchantId": {
+          "$ref": "#/definitions/merchantId"
+        },
+        "lastSynchronizationUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "merchantId": {
+      "type": "string",
+      "description": "The merchant identifier",
+      "pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-pattern": "(^([0-9]{1,20})$)|(^([A-Z0-9]){5}$)",
+      "x-maxLength": "20",
+      "x-minLength": "1"
+    },
+    "channelDiscussionId": {
+      "description": "The channel discussion identifier",
+      "type": "string",
+      "maxLength": 50,
+      "x-maxLength": "50"
+    },
+    "discussionSubject": {
+      "type": "string",
+      "description": "The subject of the discussion",
+      "maxLength": 250,
+      "x-maxLength": "250",
+      "x-cultureSensitive": "true"
+    },
+    "discussionStatus": {
+      "type": "string",
+      "description": "The status of the discussion",
+      "enum": [
+        "UNKNOWN",
+        "OPEN",
+        "PENDING",
+        "SOLVED",
+        "CLOSED"
+      ]
+    },
+    "discussionType": {
+      "type": "string",
+      "description": "The type of the discussion",
+      "enum": [
+        "ORDER",
+        "PRODUCT",
+        "OTHER"
+      ]
+    },
+    "discussionSubType": {
+      "type": "string",
+      "enum": [
+        "ORDERADDRESS",
+        "ORDERCANCELLATION",
+        "ORDERDELAY",
+        "ORDERINCOMPLETE",
+        "ORDERINVOICE",
+        "ORDERNOTRECEIVED",
+        "ORDERPAYMENT",
+        "ORDERPRODUCTDEFECT",
+        "ORDERPRODUCTWRONG",
+        "ORDERREFUND",
+        "ORDERRETURN",
+        "ORDEROTHER",
+        "PRODUCTINVENTORY",
+        "PRODUCTCHARACTERISTICS",
+        "PRODUCTOTHER",
+        "OTHER"
+      ]
+    },
+    "getDiscussionEntityResponse": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/discussionEntityType"
+        },
+        "id": {
+          "$ref": "#/definitions/discussionEntityId"
+        },
+        "name": {
+          "$ref": "#/definitions/discussionEntityName"
+        }
+      }
+    },
+    "getDiscussionMessageResponse": {
+      "type": "object",
+      "properties": {
+        "channelDiscussionMessageId": {
+          "$ref": "#/definitions/channelDiscussionMessageId"
+        },
+        "body": {
+          "$ref": "#/definitions/discussionMessageBody"
+        },
+        "from": {
+          "$ref": "#/definitions/getDiscussionMessageParticipantResponse"
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/getDiscussionMessageParticipantResponse"
+          }
+        },
+        "isTest": {
+          "type": "boolean",
+          "description": "If true, the message will be sent to the channel test environment or it will be only kept inside the system not sent to anyone"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/getDiscussionMessageAttachmentResponse"
+          }
+        },
+        "channelCreationUtcDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "discussionId": {
+      "type": "string",
+      "description": "The discussion identifier",
+      "format": "Guid"
+    },
+    "discussionMessageId": {
+      "type": "string",
+      "format": "guid"
+    },
+    "discussionMessageBody": {
+      "type": "string",
+      "maxLength": 49152,
+      "x-maxLength": "49152"
+    },
+    "createDiscussionMessageParticipantRequest": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/discussionParticipantType"
+        },
+        "email": {
+          "$ref": "#/definitions/email"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/phoneNumber"
+        },
+        "displayName": {
+          "$ref": "#/definitions/discussionParticipantDisplayName"
+        },
+        "channelParticipantId": {
+          "$ref": "#/definitions/channelParticipantId"
+        }
+      }
+    },
+    "createDiscussionMessageAttachmentRequest": {
+      "type": "object",
+      "required": [
+        "name",
+        "url",
+        "contentType",
+        "size"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/fileName"
+        },
+        "url": {
+          "$ref": "#/definitions/httpUrl"
+        },
+        "contentType": {
+          "$ref": "#/definitions/fileContentType"
+        },
+        "size": {
+          "$ref": "#/definitions/discussionMessageAttachmentFileSize"
+        }
+      }
+    },
+    "channelDiscussionMessageId": {
+      "type": "string",
+      "maxLength": 200,
+      "x-maxLength": "200"
+    },
+    "createDiscussionEntityRequest": {
+      "description": "Entity related to the discussion",
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/discussionEntityType"
+        },
+        "id": {
+          "$ref": "#/definitions/discussionEntityId"
+        },
+        "name": {
+          "$ref": "#/definitions/discussionEntityName"
+        }
+      }
+    },
+    "createDiscussionMessageRequest": {
+      "type": "object",
+      "required": [
+        "discussionId",
+        "discussionMessageId",
+        "body",
+        "from",
+        "to"
+      ],
+      "properties": {
+        "discussionId": {
+          "$ref": "#/definitions/discussionId"
+        },
+        "discussionMessageId": {
+          "$ref": "#/definitions/discussionMessageId"
+        },
+        "body": {
+          "$ref": "#/definitions/discussionMessageBody"
+        },
+        "from": {
+          "$ref": "#/definitions/createDiscussionMessageParticipantRequest"
+        },
+        "to": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/createDiscussionMessageParticipantRequest"
+          }
+        },
+        "isTest": {
+          "type": "boolean",
+          "description": "If true, the message will be sent to the channel test environment or it will be only kept inside the system not sent to anyone"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/createDiscussionMessageAttachmentRequest"
+          }
+        }
+      }
+    },
+    "discussionEntityType": {
+      "description": "The discussion entity type",
+      "type": "string",
+      "enum": [
+        "MERCHANTORDERID",
+        "CHANNELORDERID",
+        "MERCHANTDISCUSSIONID",
+        "CHANNELDISCUSSIONID",
+        "CHANNELPRODUCTGTIN",
+        "CHANNELPRODUCTSKU",
+        "CHANNELPRODUCTMPN",
+        "OTHER"
+      ]
+    },
+    "discussionEntityId": {
+      "description": "The identifier of the entity related to the discussion",
+      "type": "string",
+      "maxLength": 36,
+      "x-maxLength": "36"
+    },
+    "discussionEntityName": {
+      "type": "string",
+      "description": "Discussion entity name",
+      "maxLength": 250,
+      "x-maxLength": "250"
+    },
+    "getDiscussionMessageParticipantResponse": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/discussionParticipantType"
+        },
+        "email": {
+          "$ref": "#/definitions/email"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/phoneNumber"
+        },
+        "displayName": {
+          "$ref": "#/definitions/discussionParticipantDisplayName"
+        },
+        "channelParticipantId": {
+          "$ref": "#/definitions/channelParticipantId"
+        }
+      }
+    },
+    "getDiscussionMessageAttachmentResponse": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/fileName"
+        },
+        "url": {
+          "$ref": "#/definitions/httpUrl"
+        },
+        "contentType": {
+          "$ref": "#/definitions/fileContentType"
+        },
+        "size": {
+          "$ref": "#/definitions/discussionMessageAttachmentFileSize"
+        }
+      }
+    },
+    "discussionParticipantType": {
+      "type": "string",
+      "enum": [
+        "OPERATOR",
+        "CHANNELOPERATOR",
+        "MERCHANT",
+        "BUYER"
+      ]
+    },
+    "email": {
+      "x-exclude": true,
+      "description": "The email",
+      "type": "string",
+      "format": "email",
+      "pattern": "^(.+)@(.+)$",
+      "x-pattern": "^(.+)@(.+)$",
+      "example": "paulsimon@mysupercompany.com",
+      "x-maxLength": "320",
+      "x-minLength": "3"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "maxLength": 50,
+      "x-maxLength": "50"
+    },
+    "discussionParticipantDisplayName": {
+      "type": "string",
+      "maxLength": 250,
+      "x-maxLength": "250"
+    },
+    "channelParticipantId": {
+      "type": "string",
+      "maxLength": 50,
+      "x-maxLength": "50"
+    },
+    "fileName": {
+      "type": "string",
+      "maxLength": 250,
+      "x-maxLength": "250"
+    },
+    "httpUrl": {
+      "x-exclude": true,
+      "description": "The URL <a href=\"https://en.wikipedia.org/wiki/URL\">https://en.wikipedia.org/wiki/URL</a>",
+      "type": "string",
+      "pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "x-pattern": "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$",
+      "example": "http://www.mydomain.com",
+      "x-maxLength": "500",
+      "x-cultureSensitive": "true"
+    },
+    "fileContentType": {
+      "type": "string",
+      "maxLength": 100,
+      "x-maxLength": "100"
+    },
+    "discussionMessageAttachmentFileSize": {
+      "type": "integer",
+      "x-format": "long",
+      "minimum": 0,
+      "x-minimum": "0"
+    },
+    "errorCode": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "the error code. The error code can be a pattern containing the argument's name",
+      "example": "CatalogImportationAlreadyInProgress(ExecutionId currentCatalogImportationId)"
+    },
+    "cultureName": {
+      "x-exclude": true,
+      "type": "string",
+      "description": "If the error is translated, the culture name will be indicated",
+      "example": "en"
+    },
+    "userErrorMessageArguments": {
+      "x-exclude": true,
+      "type": "object",
+      "description": "a dictionary string/object",
+      "additionalProperties": {
+        "type": "object"
+      }
     }
   },
   "parameters": {
@@ -1687,6 +2740,45 @@
       "type": "string",
       "format": "OrderChangeId",
       "description": "Order change identifier which is equivalent to the correlationId"
+    },
+    "channelConfigHeaderParameter": {
+      "name": "X-CONV-CHANNEL-CONFIG",
+      "in": "header",
+      "required": true,
+      "x-base64": "true",
+      "description": "It's the channel configuration, serialiazed in json in base64.",
+      "type": "string",
+      "x-base64JsonType": "Dictionary<string,string>"
+    },
+    "channelAccountConfigHeaderParameter": {
+      "name": "X-CONV-CHANNELACCOUNT-CONFIG",
+      "in": "header",
+      "required": true,
+      "x-base64": "true",
+      "description": "It's the merchant configuration related to the channel, serialiazed in json in base64.",
+      "type": "string",
+      "x-base64JsonType": "Dictionary<string,string>"
+    },
+    "conversationChannelCodePathParameter": {
+      "name": "conversationChannelCode",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "ConversationChannelCode"
+    },
+    "merchantIdPathParameter": {
+      "name": "merchantId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "MerchantId"
+    },
+    "channelDiscussionIdPathParameter": {
+      "name": "channelDiscussionId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "ChannelDiscussionId"
     }
   },
   "responses": {
@@ -1796,6 +2888,15 @@
         "ETag": {
           "type": "string",
           "description": "ETag value to identify the current version of the resource\\\nFor more details go to this link: http://tools.ietf.org/html/rfc7232#section-2.3\n"
+        }
+      }
+    },
+    "429_TooManyRequests": {
+      "description": "Occurs when the server received too many requests",
+      "headers": {
+        "Retry-After": {
+          "description": "indicates the remaining time until the server will accept new requests. For more details, please follow this link https://tools.ietf.org/html/rfc7231#section-7.1.3",
+          "type": "string"
         }
       }
     }
