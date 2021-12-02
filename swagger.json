@@ -2101,6 +2101,12 @@
         "channelCreationUtcDate": {
           "type": "string",
           "format": "date-time"
+        },
+        "additionalDatas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/additionalData"
+          }
         }
       }
     },
@@ -2153,6 +2159,12 @@
         },
         "replyToChannelDiscussionMessageId": {
           "$ref": "#/definitions/channelDiscussionMessageId"
+        },
+        "additionalInfo": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
         }
       }
     },
@@ -2386,6 +2398,21 @@
         "channelCreationUtcDate": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "additionalData": {
+      "type": "object",
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
         }
       }
     },
