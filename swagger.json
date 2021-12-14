@@ -1123,6 +1123,12 @@
           },
           {
             "$ref": "#/parameters/channelAccountConfigHeaderParameter"
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "type": "boolean",
+            "required": false
           }
         ],
         "responses": {
