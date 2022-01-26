@@ -2434,7 +2434,8 @@
     "discussionMessageBody": {
       "type": "string",
       "maxLength": 49152,
-      "x-maxLength": "49152"
+      "x-maxLength": "49152",
+      "x-minValueLength": "0"
     },
     "createDiscussionMessageParticipantRequest": {
       "type": "object",
