@@ -2404,6 +2404,12 @@
         "channelCreationUtcDate": {
           "type": "string",
           "format": "date-time"
+        },
+        "additionalDatas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/additionalData"
+          }
         }
       }
     },
