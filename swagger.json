@@ -2347,6 +2347,8 @@
         "ORDERPRODUCTWRONG",
         "ORDERREFUND",
         "ORDERRETURN",
+        "ORDERNOTIFICATION",
+        "ORDERACKNOWLEDGEMENT",
         "ORDEROTHER",
         "PRODUCTINVENTORY",
         "PRODUCTCHARACTERISTICS",
@@ -2861,6 +2863,11 @@
           "type": "string",
           "description": "The exchange messages with the marketplace. Exchange Messages type serialized in Json encoded in base64.",
           "format": "ExchangedMessages"
+        },
+        "x-BeezUP-AdditionalCredentials": {
+          "type": "string",
+          "description": "The additional credentials from the marketplace to save in BeezUP. BeezupAdditionalCredentials type serialized in Json encoded in base64.",
+          "format": "BeezupAdditionalCredentials"
         }
       },
       "schema": {
