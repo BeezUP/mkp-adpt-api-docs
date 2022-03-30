@@ -2866,8 +2866,8 @@
         },
         "x-BeezUP-AdditionalCredentials": {
           "type": "string",
-          "description": "The additional credentials from the marketplace to save in BeezUP. BeezupAdditionalCredentials type serialized in Json encoded in base64.",
-          "format": "BeezupAdditionalCredentials"
+          "description": "The additional credentials from the marketplace to save in BeezUP. BeezUPAdditionalCredential[] type serialized in Json encoded in base64.",
+          "format": "BeezUPAdditionalCredential[]"
         }
       },
       "schema": {
