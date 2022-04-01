@@ -2590,8 +2590,8 @@
     "discussionEntityId": {
       "description": "The identifier of the entity related to the discussion",
       "type": "string",
-      "maxLength": 36,
-      "x-maxLength": "36"
+      "maxLength": 100,
+      "x-maxLength": "100"
     },
     "discussionEntityName": {
       "type": "string",
@@ -2671,8 +2671,8 @@
     },
     "channelParticipantId": {
       "type": "string",
-      "maxLength": 50,
-      "x-maxLength": "50"
+      "maxLength": 70,
+      "x-maxLength": "70"
     },
     "fileName": {
       "type": "string",
