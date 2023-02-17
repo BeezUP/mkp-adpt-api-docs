@@ -11,4 +11,4 @@ jobs:
         id: sync-epic
         uses: kiali/kiali-epic-action@v1.0.1
         with:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.GH_APP_CREDENTIALS_TOKEN }}
