@@ -350,6 +350,9 @@
           "503": {
             "$ref": "#/responses/503_Marketplace_Down"
           },
+          "504": {
+            "$ref": "#/responses/504_Gateway_Timeout"
+          },
           "default": {
             "$ref": "#/responses/GeneralError"
           }
@@ -2010,7 +2013,8 @@
         "CancelOrder",
         "RefundOrder",
         "RestockOrder",
-        "PickUpOrder"
+        "PickUpOrder",
+        "InvoiceOrder"
       ]
     },
     "marketplaceOrderItem": {
@@ -2309,8 +2313,8 @@
     "discussionSubject": {
       "type": "string",
       "description": "The subject of the discussion",
-      "maxLength": 250,
-      "x-maxLength": "250",
+      "maxLength": 500,
+      "x-maxLength": "500",
       "x-cultureSensitive": "true"
     },
     "discussionStatus": {
@@ -2943,6 +2947,12 @@
           "format": "ExchangedMessages"
         }
       },
+      "schema": {
+        "$ref": "#/definitions/errorResponseMessage"
+      }
+    },
+    "504_Gateway_Timeout": {
+      "description": "Timeout on the api server",
       "schema": {
         "$ref": "#/definitions/errorResponseMessage"
       }
