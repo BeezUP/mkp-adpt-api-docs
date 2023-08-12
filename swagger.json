@@ -2677,8 +2677,8 @@
     },
     "channelParticipantId": {
       "type": "string",
-      "maxLength": 70,
-      "x-maxLength": "70"
+      "maxLength": 100,
+      "x-maxLength": "100"
     },
     "fileName": {
       "type": "string",
