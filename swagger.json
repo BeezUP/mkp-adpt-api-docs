@@ -2596,8 +2596,8 @@
     "discussionEntityId": {
       "description": "The identifier of the entity related to the discussion",
       "type": "string",
-      "maxLength": 100,
-      "x-maxLength": "100"
+      "maxLength": 150,
+      "x-maxLength": "150"
     },
     "discussionEntityName": {
       "type": "string",
