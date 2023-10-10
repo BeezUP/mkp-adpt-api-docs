@@ -2873,7 +2873,7 @@
         },
         "x-BeezUP-AdditionalCredentials": {
           "type": "string",
-          "description": "The additional credentials from the marketplace to save in BeezUP. \nThe header value is a BeezUPAdditionalCredential[] type serialized in Json encoded in base64.\nEach BeezUPAdditionalCredential is comprised of a Key and a Value:     \nKey is the name of the property in BeezUP system (the nomenclature is important).\nValue is the provided value from the marketplace implementation.\nExample of expected format: [{key:\"key\",value:\"value\"},{key:\"key2\",value:\"value2\"}]\n"
+          "description": "The additional credentials from the marketplace to save in BeezUP. \nThe header value is a BeezUPAdditionalCredential[] type serialized in Json encoded in base64.\nEach BeezUPAdditionalCredential is comprised of a Key and a Value:     \nKey is the name of the property in BeezUP system (the nomenclature is important).\nValue is the provided value from the marketplace implementation.\nExample of expected format: [{accessToken:\"123\",authorizationCode:\"456\"},{refreshToken:\"789\",grant_type:\"client_credentials\"}]\n"
         }
       },
       "schema": {
