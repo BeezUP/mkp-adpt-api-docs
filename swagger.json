@@ -2014,7 +2014,8 @@
         "RefundOrder",
         "RestockOrder",
         "PickUpOrder",
-        "InvoiceOrder"
+        "InvoiceOrder",
+        "SetOrderAsDelivered"
       ]
     },
     "marketplaceOrderItem": {
